@@ -25,7 +25,7 @@ public class GeminiAiAdapter implements AiEnrichmentPort {
 
     public GeminiAiAdapter(
             @Value("${gemini.api-key:}") String apiKey,
-            @Value("${gemini.model:gemini-2.5-flash}") String model,
+            @Value("${gemini.model:gemini-1.5-flash}") String model,
             RuleBasedCategoryFallback fallback
     ) {
         this.apiKey = apiKey;
