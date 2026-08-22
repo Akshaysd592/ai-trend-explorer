@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Trend Service API
-  description: Multi-Platform AI Trend Aggregation, Scoring, Search, and Pagination API Specification.
+  description: Multi-Platform AI Trend Aggregation, Scoring, Search, Pagination, and Automated Ingestion API Specification.
   version: 1.0.0
 
 servers:
@@ -12,7 +12,7 @@ servers:
 
 tags:
   - name: Trends
-    description: Aggregated AI repositories, open-weights models, trend scoring, search, and pagination.
+    description: Aggregated AI repositories, open-weights models, trend scoring, search, pagination, and ingestion.
 
 paths:
   /api/v1/trends:
@@ -101,6 +101,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
+
+  /api/v1/trends/ingest:
+    post:
+      tags:
+        - Trends
+      summary: Manually trigger multi-platform AI trend ingestion from GitHub and Hugging Face
+      operationId: ingestTrends
+      responses:
+        '200':
+          description: Trend ingestion completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngestionResultDto'
 
   /api/v1/trends/{id}:
     get:
@@ -246,6 +260,22 @@ components:
         last:
           type: boolean
           example: true
+
+    IngestionResultDto:
+      type: object
+      properties:
+        totalIngested:
+          type: integer
+          example: 35
+        githubCount:
+          type: integer
+          example: 20
+        huggingFaceCount:
+          type: integer
+          example: 15
+        timestamp:
+          type: string
+          format: date-time
 
     SourceType:
       type: string
