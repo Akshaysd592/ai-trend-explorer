@@ -8,3 +8,4 @@ public record IngestionResult(
         int huggingFaceCount,
         Instant timestamp
 ) {}
+
