@@ -1,0 +1,487 @@
+openapi: 3.0.3
+info:
+  title: AI Trend Analyzer Microservices API
+  description: |
+    Production-grade RESTful API specification for the **AI Trend Analyzer** platform.
+    Includes Authentication & User Management (`auth-service`) and AI Trend Intelligence (`trend-service`) routed via Spring Cloud Gateway.
+  version: 1.0.0
+  contact:
+    name: AI Trend Engineering Team
+    url: https://github.com/Akshaysd592/ai-trend-explorer
+
+servers:
+  - url: http://localhost:8080
+    description: API Gateway (Centralized Edge Routing & CORS)
+  - url: http://localhost:8081
+    description: Direct Trend Service (Port 8081)
+  - url: http://localhost:8082
+    description: Direct Auth Service (Port 8082)
+
+tags:
+  - name: Authentication
+    description: User registration, JWT credential authentication, token renewal, and profile operations.
+  - name: Trends
+    description: Aggregated AI repositories, open-weights models, trend scoring, search, and pagination.
+
+paths:
+  /api/v1/auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user account
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequestDto'
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponseDto'
+        '400':
+          description: Validation error or invalid request payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '409':
+          description: Account already exists for given email
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+  /api/v1/auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Authenticate credentials and generate JWT tokens
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequestDto'
+      responses:
+        '200':
+          description: Authentication successful, returning access & refresh tokens
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponseDto'
+        '401':
+          description: Invalid email or password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+  /api/v1/auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Renew JWT access token using a valid refresh token
+      operationId: refreshToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequestDto'
+      responses:
+        '200':
+          description: Token renewed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponseDto'
+        '401':
+          description: Invalid or expired refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+  /api/v1/auth/me:
+    get:
+      tags:
+        - Authentication
+      summary: Retrieve authenticated user profile
+      operationId: getCurrentUser
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponseDto'
+        '401':
+          description: Unauthorized - missing or invalid Bearer token
+
+  /api/v1/trends:
+    get:
+      tags:
+        - Trends
+      summary: Get paginated, filtered, and searchable AI trends
+      operationId: getTrends
+      parameters:
+        - name: source
+          in: query
+          description: Filter trends by platform (e.g. GITHUB, HUGGING_FACE)
+          required: false
+          schema:
+            $ref: '#/components/schemas/SourceType'
+        - name: language
+          in: query
+          description: Filter by primary programming language (e.g. Python, Go, TypeScript)
+          required: false
+          schema:
+            type: string
+        - name: q
+          in: query
+          description: Search keyword matching title, description, or AI category
+          required: false
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: Zero-based page index
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          description: Number of items per page (1 to 100)
+          required: false
+          schema:
+            type: integer
+            default: 20
+        - name: sortBy
+          in: query
+          description: Property to sort by (stars, score, created, title)
+          required: false
+          schema:
+            type: string
+            default: stars
+        - name: sortDir
+          in: query
+          description: Sort direction (asc or desc)
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+      responses:
+        '200':
+          description: Paginated trend items
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedResultTrendResponseDto'
+
+    post:
+      tags:
+        - Trends
+      summary: Create or ingest a new AI trend item
+      operationId: createTrend
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTrendRequestDto'
+      responses:
+        '201':
+          description: Trend item created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrendResponseDto'
+        '400':
+          description: Invalid request payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+  /api/v1/trends/{id}:
+    get:
+      tags:
+        - Trends
+      summary: Get a single AI trend by ID
+      operationId: getTrendById
+      parameters:
+        - name: id
+          in: path
+          description: Unique database identifier of the trend
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Trend item details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrendResponseDto'
+        '404':
+          description: Trend item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Enter JWT Bearer token obtained from `/api/v1/auth/login`.
+
+  schemas:
+    RegisterRequestDto:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: developer@aitrend.com
+        password:
+          type: string
+          minLength: 6
+          example: SecurePassword123!
+        firstName:
+          type: string
+          example: Akshay
+        lastName:
+          type: string
+          example: Dev
+
+    LoginRequestDto:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: developer@aitrend.com
+        password:
+          type: string
+          example: SecurePassword123!
+
+    RefreshTokenRequestDto:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+          example: eyJhbGciOiJIUzUxMiJ9...
+
+    AuthResponseDto:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          example: eyJhbGciOiJIUzUxMiJ9...
+        refreshToken:
+          type: string
+          example: eyJhbGciOiJIUzUxMiJ9...
+        tokenType:
+          type: string
+          example: Bearer
+        expiresInSeconds:
+          type: integer
+          example: 900
+        user:
+          $ref: '#/components/schemas/UserResponseDto'
+
+    UserResponseDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        email:
+          type: string
+          example: developer@aitrend.com
+        firstName:
+          type: string
+          example: Akshay
+        lastName:
+          type: string
+          example: Dev
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Role'
+        enabled:
+          type: boolean
+          example: true
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-08-22T12:36:03"
+
+    CreateTrendRequestDto:
+      type: object
+      required:
+        - title
+        - source
+      properties:
+        title:
+          type: string
+          example: ollama/ollama
+        description:
+          type: string
+          example: Get up and running with Llama 3.1, Mistral, Gemma 2, and other LLMs locally.
+        repositoryUrl:
+          type: string
+          example: https://github.com/ollama/ollama
+        source:
+          $ref: '#/components/schemas/SourceType'
+        stars:
+          type: integer
+          example: 92450
+        forks:
+          type: integer
+          example: 7820
+        language:
+          type: string
+          example: Go
+        topics:
+          type: array
+          items:
+            type: string
+          example: ["llm", "local-ai"]
+        trendScore:
+          type: number
+          format: double
+          example: 99.5
+        aiCategory:
+          type: string
+          example: Local LLM Execution
+        aiSummary:
+          type: string
+          example: High velocity repository simplifying local inferencing.
+
+    TrendResponseDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        title:
+          type: string
+          example: ollama/ollama
+        description:
+          type: string
+          example: Get up and running with Llama 3.1, Mistral, Gemma 2, and other LLMs locally.
+        repositoryUrl:
+          type: string
+          example: https://github.com/ollama/ollama
+        source:
+          $ref: '#/components/schemas/SourceType'
+        stars:
+          type: integer
+          example: 92450
+        forks:
+          type: integer
+          example: 7820
+        language:
+          type: string
+          example: Go
+        topics:
+          type: array
+          items:
+            type: string
+          example: ["llm", "local-ai"]
+        trendScore:
+          type: number
+          format: double
+          example: 99.5
+        aiCategory:
+          type: string
+          example: Local LLM Execution
+        aiSummary:
+          type: string
+          example: High velocity repository simplifying local inferencing.
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    PagedResultTrendResponseDto:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/TrendResponseDto'
+        pageNumber:
+          type: integer
+          example: 0
+        pageSize:
+          type: integer
+          example: 20
+        totalElements:
+          type: integer
+          format: int64
+          example: 5
+        totalPages:
+          type: integer
+          example: 1
+        last:
+          type: boolean
+          example: true
+
+    SourceType:
+      type: string
+      enum:
+        - GITHUB
+        - HUGGING_FACE
+
+    Role:
+      type: string
+      enum:
+        - ROLE_USER
+        - ROLE_ADMIN
+
+    ProblemDetail:
+      type: object
+      properties:
+        type:
+          type: string
+          example: https://api.aitrend.com/errors/bad-request
+        title:
+          type: string
+          example: Validation failed
+        status:
+          type: integer
+          example: 400
+        detail:
+          type: string
+          example: Email is required
+        timestamp:
+          type: string
+          format: date-time
