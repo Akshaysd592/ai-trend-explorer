@@ -1,0 +1,5 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/changes/001-create-trends-schema.yaml
+  - include:
+      file: db/changelog/changes/002-insert-sample-trends.yaml

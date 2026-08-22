@@ -1,0 +1,89 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-insert-initial-seed-trends
+      author: ai-trend-team
+      changes:
+        - insert:
+            tableName: trends
+            columns:
+              - column: { name: title, value: "ollama/ollama" }
+              - column: { name: description, value: "Get up and running with Llama 3.1, Mistral, Gemma 2, and other large language models locally." }
+              - column: { name: repository_url, value: "https://github.com/ollama/ollama" }
+              - column: { name: source, value: "GITHUB" }
+              - column: { name: stars, value: 92450 }
+              - column: { name: forks, value: 7820 }
+              - column: { name: language, value: "Go" }
+              - column: { name: topics_csv, value: "llm,llama3,local-ai,deep-learning,ai-tools" }
+              - column: { name: trend_score, value: 99.5 }
+              - column: { name: ai_category, value: "Local LLM Execution" }
+              - column: { name: ai_summary, value: "High velocity repository simplifying local inferencing for open-weights models." }
+              - column: { name: created_at, value: "2026-08-20 10:00:00" }
+              - column: { name: updated_at, value: "2026-08-22 08:30:00" }
+
+        - insert:
+            tableName: trends
+            columns:
+              - column: { name: title, value: "vllm-project/vllm" }
+              - column: { name: description, value: "A high-throughput and memory-efficient serving engine for LLMs with PagedAttention." }
+              - column: { name: repository_url, value: "https://github.com/vllm-project/vllm" }
+              - column: { name: source, value: "GITHUB" }
+              - column: { name: stars, value: 32100 }
+              - column: { name: forks, value: 4520 }
+              - column: { name: language, value: "Python" }
+              - column: { name: topics_csv, value: "inference,pagedattention,vllm,serving,python" }
+              - column: { name: trend_score, value: 97.2 }
+              - column: { name: ai_category, value: "LLM Infrastructure" }
+              - column: { name: ai_summary, value: "Industry standard inferencing engine supporting KV cache memory optimizations." }
+              - column: { name: created_at, value: "2026-08-21 11:00:00" }
+              - column: { name: updated_at, value: "2026-08-22 08:45:00" }
+
+        - insert:
+            tableName: trends
+            columns:
+              - column: { name: title, value: "Qwen2.5-72B-Instruct" }
+              - column: { name: description, value: "State of the art 72B parameter instruction-tuned model outperforming closed source models." }
+              - column: { name: repository_url, value: "https://huggingface.co/Qwen/Qwen2.5-72B-Instruct" }
+              - column: { name: source, value: "HUGGING_FACE" }
+              - column: { name: stars, value: 18450 }
+              - column: { name: forks, value: 2310 }
+              - column: { name: language, value: "Python" }
+              - column: { name: topics_csv, value: "qwen,transformers,instruct,llm,huggingface" }
+              - column: { name: trend_score, value: 98.8 }
+              - column: { name: ai_category, value: "Open Weights LLM" }
+              - column: { name: ai_summary, value: "Top-ranking open weights model with enhanced coding and mathematical capabilities." }
+              - column: { name: created_at, value: "2026-08-19 14:00:00" }
+              - column: { name: updated_at, value: "2026-08-22 09:00:00" }
+
+        - insert:
+            tableName: trends
+            columns:
+              - column: { name: title, value: "Flux.1-schnell" }
+              - column: { name: description, value: "12 billion parameter flow matching image generation model for high speed generation." }
+              - column: { name: repository_url, value: "https://huggingface.co/black-forest-labs/FLUX.1-schnell" }
+              - column: { name: source, value: "HUGGING_FACE" }
+              - column: { name: stars, value: 14200 }
+              - column: { name: forks, value: 1150 }
+              - column: { name: language, value: "Python" }
+              - column: { name: topics_csv, value: "diffusion,flux,image-generation,text-to-image" }
+              - column: { name: trend_score, value: 96.4 }
+              - column: { name: ai_category, value: "Generative Media" }
+              - column: { name: ai_summary, value: "Next generation text-to-image generator with unrivaled typography adherence." }
+              - column: { name: created_at, value: "2026-08-20 16:20:00" }
+              - column: { name: updated_at, value: "2026-08-22 07:15:00" }
+
+        - insert:
+            tableName: trends
+            columns:
+              - column: { name: title, value: "DeepSeek-V3" }
+              - column: { name: description, value: "A strong Mixture-of-Experts (MoE) language model with 671B total parameters and 37B active parameters per token." }
+              - column: { name: repository_url, value: "https://huggingface.co/deepseek-ai/DeepSeek-V3" }
+              - column: { name: source, value: "HUGGING_FACE" }
+              - column: { name: stars, value: 29800 }
+              - column: { name: forks, value: 3100 }
+              - column: { name: language, value: "Python" }
+              - column: { name: topics_csv, value: "moe,deepseek,llm,transformers,huggingface" }
+              - column: { name: trend_score, value: 99.4 }
+              - column: { name: ai_category, value: "MoE Language Model" }
+              - column: { name: ai_summary, value: "State of the art open MoE architecture trained with Multi-head Latent Attention (MLA)." }
+              - column: { name: created_at, value: "2026-08-21 09:30:00" }
+              - column: { name: updated_at, value: "2026-08-22 08:00:00" }

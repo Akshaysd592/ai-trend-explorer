@@ -1,0 +1,87 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-trends-table
+      author: ai-trend-team
+      changes:
+        - createTable:
+            tableName: trends
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: title
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: TEXT
+              - column:
+                  name: repository_url
+                  type: VARCHAR(512)
+              - column:
+                  name: source
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: stars
+                  type: INT
+                  defaultValueNumeric: 0
+              - column:
+                  name: forks
+                  type: INT
+                  defaultValueNumeric: 0
+              - column:
+                  name: language
+                  type: VARCHAR(100)
+              - column:
+                  name: topics_csv
+                  type: TEXT
+              - column:
+                  name: trend_score
+                  type: DOUBLE PRECISION
+                  defaultValueNumeric: 0.0
+              - column:
+                  name: ai_category
+                  type: VARCHAR(100)
+              - column:
+                  name: ai_summary
+                  type: TEXT
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 002-add-trends-indexes
+      author: ai-trend-team
+      changes:
+        - createIndex:
+            indexName: idx_trends_source
+            tableName: trends
+            columns:
+              - column:
+                  name: source
+        - createIndex:
+            indexName: idx_trends_stars
+            tableName: trends
+            columns:
+              - column:
+                  name: stars
+        - createIndex:
+            indexName: idx_trends_created_at
+            tableName: trends
+            columns:
+              - column:
+                  name: created_at
