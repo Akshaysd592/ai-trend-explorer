@@ -1,9 +1,6 @@
 package com.aitrend.trend.adapter.in.web;
 
-import com.aitrend.trend.application.port.in.CreateTrendCommand;
-import com.aitrend.trend.application.port.in.GetTrendsQuery;
-import com.aitrend.trend.application.port.in.PagedResult;
-import com.aitrend.trend.application.port.in.TrendUseCase;
+import com.aitrend.trend.application.port.in.*;
 import com.aitrend.trend.domain.model.Trend;
 import com.aitrend.trend.infrastructure.openapi.api.TrendsApi;
 import com.aitrend.trend.infrastructure.openapi.dto.*;
@@ -12,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.ZoneOffset;
 import java.util.List;
 
 @RestController
@@ -19,9 +17,11 @@ import java.util.List;
 public class TrendController implements TrendsApi {
 
     private final TrendUseCase trendUseCase;
+    private final IngestTrendsUseCase ingestTrendsUseCase;
 
-    public TrendController(TrendUseCase trendUseCase) {
+    public TrendController(TrendUseCase trendUseCase, IngestTrendsUseCase ingestTrendsUseCase) {
         this.trendUseCase = trendUseCase;
+        this.ingestTrendsUseCase = ingestTrendsUseCase;
     }
 
     @Override
@@ -86,8 +86,20 @@ public class TrendController implements TrendsApi {
         return ResponseEntity.status(HttpStatus.CREATED).body(toResponseDto(domain));
     }
 
+    @Override
+    @PostMapping("/ingest")
+    public ResponseEntity<IngestionResultDto> ingestTrends() {
+        IngestionResult result = ingestTrendsUseCase.ingestTrends();
+        IngestionResultDto dto = new IngestionResultDto()
+                .totalIngested(result.totalIngested())
+                .githubCount(result.githubCount())
+                .huggingFaceCount(result.huggingFaceCount())
+                .timestamp(result.timestamp().atOffset(ZoneOffset.UTC));
+        return ResponseEntity.ok(dto);
+    }
+
     private TrendResponseDto toResponseDto(Trend trend) {
-        return new TrendResponseDto()
+        TrendResponseDto dto = new TrendResponseDto()
                 .id(trend.getId())
                 .title(trend.getTitle())
                 .description(trend.getDescription())
@@ -100,5 +112,13 @@ public class TrendController implements TrendsApi {
                 .trendScore(trend.getTrendScore())
                 .aiCategory(trend.getAiCategory())
                 .aiSummary(trend.getAiSummary());
+
+        if (trend.getCreatedAt() != null) {
+            dto.setCreatedAt(trend.getCreatedAt().atOffset(ZoneOffset.UTC));
+        }
+        if (trend.getUpdatedAt() != null) {
+            dto.setUpdatedAt(trend.getUpdatedAt().atOffset(ZoneOffset.UTC));
+        }
+        return dto;
     }
 }

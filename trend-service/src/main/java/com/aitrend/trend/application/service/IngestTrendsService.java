@@ -1,0 +1,64 @@
+package com.aitrend.trend.application.service;
+
+import com.aitrend.trend.application.port.in.IngestTrendsUseCase;
+import com.aitrend.trend.application.port.in.IngestionResult;
+import com.aitrend.trend.application.port.out.FetchGitHubTrendsPort;
+import com.aitrend.trend.application.port.out.FetchHuggingFaceTrendsPort;
+import com.aitrend.trend.application.port.out.TrendRepositoryPort;
+import com.aitrend.trend.domain.model.Trend;
+import com.aitrend.trend.domain.service.TrendScoringCalculator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.util.List;
+
+@Service
+public class IngestTrendsService implements IngestTrendsUseCase {
+
+    private static final Logger log = LoggerFactory.getLogger(IngestTrendsService.class);
+
+    private final FetchGitHubTrendsPort gitHubTrendsPort;
+    private final FetchHuggingFaceTrendsPort huggingFaceTrendsPort;
+    private final TrendRepositoryPort trendRepositoryPort;
+    private final TrendScoringCalculator scoringCalculator;
+
+    public IngestTrendsService(FetchGitHubTrendsPort gitHubTrendsPort,
+                               FetchHuggingFaceTrendsPort huggingFaceTrendsPort,
+                               TrendRepositoryPort trendRepositoryPort,
+                               TrendScoringCalculator scoringCalculator) {
+        this.gitHubTrendsPort = gitHubTrendsPort;
+        this.huggingFaceTrendsPort = huggingFaceTrendsPort;
+        this.trendRepositoryPort = trendRepositoryPort;
+        this.scoringCalculator = scoringCalculator;
+    }
+
+    @Override
+    public IngestionResult ingestTrends() {
+        log.info("Starting multi-platform AI trend ingestion process...");
+
+        List<Trend> githubTrends = gitHubTrendsPort.fetchTrendingRepositories();
+        List<Trend> huggingFaceTrends = huggingFaceTrendsPort.fetchTrendingModels();
+
+        int savedGithub = 0;
+        for (Trend rawTrend : githubTrends) {
+            Trend scored = scoringCalculator.applyScoring(rawTrend);
+            trendRepositoryPort.save(scored);
+            savedGithub++;
+        }
+
+        int savedHuggingFace = 0;
+        for (Trend rawTrend : huggingFaceTrends) {
+            Trend scored = scoringCalculator.applyScoring(rawTrend);
+            trendRepositoryPort.save(scored);
+            savedHuggingFace++;
+        }
+
+        int totalSaved = savedGithub + savedHuggingFace;
+        log.info("Ingestion completed. Total items persisted: {} (GitHub: {}, HuggingFace: {})",
+                totalSaved, savedGithub, savedHuggingFace);
+
+        return new IngestionResult(totalSaved, savedGithub, savedHuggingFace, Instant.now());
+    }
+}
