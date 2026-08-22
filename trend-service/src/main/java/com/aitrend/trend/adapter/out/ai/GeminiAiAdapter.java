@@ -25,7 +25,7 @@ public class GeminiAiAdapter implements AiEnrichmentPort {
 
     public GeminiAiAdapter(
             @Value("${gemini.api-key:}") String apiKey,
-            @Value("${gemini.model:gemini-1.5-flash}") String model,
+            @Value("${gemini.model:gemini-3.5-flash-lite}") String model,
             RuleBasedCategoryFallback fallback
     ) {
         this.apiKey = apiKey;
@@ -45,9 +45,8 @@ public class GeminiAiAdapter implements AiEnrichmentPort {
             return fallback.generateFallbackMetadata(trend);
         }
 
-        log.info("Calling Gemini API ({}) to enrich trend '{}'...", model, trend.getTitle());
-
         try {
+            log.info("Calling Gemini API ({}) to enrich trend '{}'...", model, trend.getTitle());
             String promptText = String.format(
                     "You are an expert AI system cataloger. Analyze the following open-source project:\n" +
                     "Title: %s\nDescription: %s\nLanguage: %s\nTopics: %s\n\n" +
@@ -84,7 +83,7 @@ public class GeminiAiAdapter implements AiEnrichmentPort {
             log.warn("Gemini API response parsing returned empty candidate body. Using fallback.");
             return fallback.generateFallbackMetadata(trend);
         } catch (Exception e) {
-            log.error("Gemini API call failed for '{}': {}. Falling back to rule-based categorizer.", trend.getTitle(), e.getMessage());
+            log.error("Gemini API call ({}) failed for '{}': {}. Falling back to rule-based categorizer.", model, trend.getTitle(), e.getMessage());
             return fallback.generateFallbackMetadata(trend);
         }
     }
