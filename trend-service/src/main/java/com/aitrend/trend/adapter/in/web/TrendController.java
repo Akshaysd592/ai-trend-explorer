@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/trends")
-@CrossOrigin(origins = "*")
 public class TrendController {
 
     private final TrendUseCase trendUseCase;
