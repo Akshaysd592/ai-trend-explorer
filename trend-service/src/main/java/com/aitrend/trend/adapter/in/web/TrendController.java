@@ -1,27 +1,22 @@
 package com.aitrend.trend.adapter.in.web;
 
-import com.aitrend.trend.adapter.in.web.dto.CreateTrendRequestDto;
-import com.aitrend.trend.adapter.in.web.dto.TrendResponseDto;
-import com.aitrend.trend.adapter.in.web.mapper.TrendWebMapper;
+import com.aitrend.trend.application.port.in.CreateTrendCommand;
 import com.aitrend.trend.application.port.in.GetTrendsQuery;
 import com.aitrend.trend.application.port.in.PagedResult;
 import com.aitrend.trend.application.port.in.TrendUseCase;
-import com.aitrend.trend.domain.model.SourceType;
 import com.aitrend.trend.domain.model.Trend;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import com.aitrend.trend.infrastructure.openapi.api.TrendsApi;
+import com.aitrend.trend.infrastructure.openapi.dto.*;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/trends")
-@Tag(name = "Trends", description = "Aggregated AI repositories, open-weights models, trend scoring, search, and pagination.")
-public class TrendController {
+public class TrendController implements TrendsApi {
 
     private final TrendUseCase trendUseCase;
 
@@ -29,71 +24,81 @@ public class TrendController {
         this.trendUseCase = trendUseCase;
     }
 
+    @Override
     @GetMapping
-    @Operation(summary = "Get paginated, filtered, and searchable AI trends", description = "Query repositories and AI models across platforms like GitHub and Hugging Face with pagination and sorting.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Paginated list of AI trend items")
-    })
-    public ResponseEntity<PagedResult<TrendResponseDto>> getTrends(
-            @Parameter(description = "Filter trends by platform source (GITHUB, HUGGING_FACE)")
+    public ResponseEntity<PagedResultTrendResponseDto> getTrends(
             @RequestParam(required = false) SourceType source,
-
-            @Parameter(description = "Filter by primary programming language (e.g. Python, Go)")
             @RequestParam(required = false) String language,
-
-            @Parameter(description = "Search keyword matching title, description, or AI category")
-            @RequestParam(required = false, name = "q") String searchKeyword,
-
-            @Parameter(description = "Zero-based page index")
-            @RequestParam(defaultValue = "0") int page,
-
-            @Parameter(description = "Number of items per page")
-            @RequestParam(defaultValue = "20") int size,
-
-            @Parameter(description = "Field to sort by (stars, score, created, title)")
+            @RequestParam(required = false, name = "q") String q,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "20") Integer size,
             @RequestParam(defaultValue = "stars") String sortBy,
-
-            @Parameter(description = "Sort direction (asc or desc)")
             @RequestParam(defaultValue = "desc") String sortDir
     ) {
+        com.aitrend.trend.domain.model.SourceType domainSource = source != null ?
+                com.aitrend.trend.domain.model.SourceType.valueOf(source.getValue()) : null;
+
         GetTrendsQuery query = new GetTrendsQuery(
-                source, language, searchKeyword, page, size, sortBy, sortDir
+                domainSource, language, q, page != null ? page : 0, size != null ? size : 20, sortBy, sortDir
         );
         PagedResult<Trend> domainResult = trendUseCase.getTrends(query);
-        
-        PagedResult<TrendResponseDto> dtoResult = new PagedResult<>(
-                domainResult.content().stream().map(TrendWebMapper::toResponseDto).toList(),
-                domainResult.pageNumber(),
-                domainResult.pageSize(),
-                domainResult.totalElements(),
-                domainResult.totalPages(),
-                domainResult.last()
-        );
-        
-        return ResponseEntity.ok(dtoResult);
+
+        List<TrendResponseDto> dtos = domainResult.content().stream().map(this::toResponseDto).toList();
+
+        PagedResultTrendResponseDto result = new PagedResultTrendResponseDto()
+                .content(dtos)
+                .pageNumber(domainResult.pageNumber())
+                .pageSize(domainResult.pageSize())
+                .totalElements(domainResult.totalElements())
+                .totalPages(domainResult.totalPages())
+                .last(domainResult.last());
+
+        return ResponseEntity.ok(result);
     }
 
+    @Override
     @GetMapping("/{id}")
-    @Operation(summary = "Get a single AI trend by ID", description = "Retrieves full details, topics, and AI metrics for a specific trend item.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Trend details retrieved"),
-            @ApiResponse(responseCode = "404", description = "Trend item not found")
-    })
-    public ResponseEntity<TrendResponseDto> getTrendById(
-            @Parameter(description = "Unique database ID of the trend") @PathVariable Long id
-    ) {
+    public ResponseEntity<TrendResponseDto> getTrendById(@PathVariable Long id) {
         Trend domain = trendUseCase.getTrendById(id);
-        return ResponseEntity.ok(TrendWebMapper.toResponseDto(domain));
+        return ResponseEntity.ok(toResponseDto(domain));
     }
 
+    @Override
     @PostMapping
-    @Operation(summary = "Create or ingest a new AI trend item", description = "Saves a new AI trend item to the repository.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Trend item created successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid request payload")
-    })
     public ResponseEntity<TrendResponseDto> createTrend(@Valid @RequestBody CreateTrendRequestDto request) {
-        Trend domain = trendUseCase.createTrend(TrendWebMapper.toCommand(request));
-        return ResponseEntity.status(HttpStatus.CREATED).body(TrendWebMapper.toResponseDto(domain));
+        com.aitrend.trend.domain.model.SourceType domainSource = request.getSource() != null ?
+                com.aitrend.trend.domain.model.SourceType.valueOf(request.getSource().getValue()) : null;
+
+        CreateTrendCommand command = new CreateTrendCommand(
+                request.getTitle(),
+                request.getDescription(),
+                request.getRepositoryUrl(),
+                domainSource,
+                request.getStars(),
+                request.getForks(),
+                request.getLanguage(),
+                request.getTopics(),
+                request.getTrendScore(),
+                request.getAiCategory(),
+                request.getAiSummary()
+        );
+        Trend domain = trendUseCase.createTrend(command);
+        return ResponseEntity.status(HttpStatus.CREATED).body(toResponseDto(domain));
+    }
+
+    private TrendResponseDto toResponseDto(Trend trend) {
+        return new TrendResponseDto()
+                .id(trend.getId())
+                .title(trend.getTitle())
+                .description(trend.getDescription())
+                .repositoryUrl(trend.getRepositoryUrl())
+                .source(trend.getSource() != null ? SourceType.fromValue(trend.getSource().name()) : null)
+                .stars(trend.getStars())
+                .forks(trend.getForks())
+                .language(trend.getLanguage())
+                .topics(trend.getTopics())
+                .trendScore(trend.getTrendScore())
+                .aiCategory(trend.getAiCategory())
+                .aiSummary(trend.getAiSummary());
     }
 }

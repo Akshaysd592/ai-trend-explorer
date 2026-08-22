@@ -1,131 +1,20 @@
 openapi: 3.0.3
 info:
-  title: AI Trend Analyzer Microservices API
-  description: |
-    Production-grade RESTful API specification for the **AI Trend Analyzer** platform.
-    Includes Authentication & User Management (`auth-service`) and AI Trend Intelligence (`trend-service`) routed via Spring Cloud Gateway.
+  title: Trend Service API
+  description: Multi-Platform AI Trend Aggregation, Scoring, Search, and Pagination API Specification.
   version: 1.0.0
-  contact:
-    name: AI Trend Engineering Team
-    url: https://github.com/Akshaysd592/ai-trend-explorer
 
 servers:
-  - url: http://localhost:8080
-    description: API Gateway (Centralized Edge Routing & CORS)
   - url: http://localhost:8081
-    description: Direct Trend Service (Port 8081)
-  - url: http://localhost:8082
-    description: Direct Auth Service (Port 8082)
+    description: Direct Trend Service
+  - url: http://localhost:8080
+    description: API Gateway
 
 tags:
-  - name: Authentication
-    description: User registration, JWT credential authentication, token renewal, and profile operations.
   - name: Trends
     description: Aggregated AI repositories, open-weights models, trend scoring, search, and pagination.
 
 paths:
-  /api/v1/auth/register:
-    post:
-      tags:
-        - Authentication
-      summary: Register a new user account
-      operationId: registerUser
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RegisterRequestDto'
-      responses:
-        '201':
-          description: User registered successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserResponseDto'
-        '400':
-          description: Validation error or invalid request payload
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
-        '409':
-          description: Account already exists for given email
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
-
-  /api/v1/auth/login:
-    post:
-      tags:
-        - Authentication
-      summary: Authenticate credentials and generate JWT tokens
-      operationId: loginUser
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/LoginRequestDto'
-      responses:
-        '200':
-          description: Authentication successful, returning access & refresh tokens
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthResponseDto'
-        '401':
-          description: Invalid email or password
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
-
-  /api/v1/auth/refresh:
-    post:
-      tags:
-        - Authentication
-      summary: Renew JWT access token using a valid refresh token
-      operationId: refreshToken
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RefreshTokenRequestDto'
-      responses:
-        '200':
-          description: Token renewed successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthResponseDto'
-        '401':
-          description: Invalid or expired refresh token
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
-
-  /api/v1/auth/me:
-    get:
-      tags:
-        - Authentication
-      summary: Retrieve authenticated user profile
-      operationId: getCurrentUser
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Profile retrieved successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserResponseDto'
-        '401':
-          description: Unauthorized - missing or invalid Bearer token
-
   /api/v1/trends:
     get:
       tags:
@@ -242,104 +131,7 @@ paths:
                 $ref: '#/components/schemas/ProblemDetail'
 
 components:
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-      description: Enter JWT Bearer token obtained from `/api/v1/auth/login`.
-
   schemas:
-    RegisterRequestDto:
-      type: object
-      required:
-        - email
-        - password
-      properties:
-        email:
-          type: string
-          format: email
-          example: developer@aitrend.com
-        password:
-          type: string
-          minLength: 6
-          example: SecurePassword123!
-        firstName:
-          type: string
-          example: Akshay
-        lastName:
-          type: string
-          example: Dev
-
-    LoginRequestDto:
-      type: object
-      required:
-        - email
-        - password
-      properties:
-        email:
-          type: string
-          format: email
-          example: developer@aitrend.com
-        password:
-          type: string
-          example: SecurePassword123!
-
-    RefreshTokenRequestDto:
-      type: object
-      required:
-        - refreshToken
-      properties:
-        refreshToken:
-          type: string
-          example: eyJhbGciOiJIUzUxMiJ9...
-
-    AuthResponseDto:
-      type: object
-      properties:
-        accessToken:
-          type: string
-          example: eyJhbGciOiJIUzUxMiJ9...
-        refreshToken:
-          type: string
-          example: eyJhbGciOiJIUzUxMiJ9...
-        tokenType:
-          type: string
-          example: Bearer
-        expiresInSeconds:
-          type: integer
-          example: 900
-        user:
-          $ref: '#/components/schemas/UserResponseDto'
-
-    UserResponseDto:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          example: 1
-        email:
-          type: string
-          example: developer@aitrend.com
-        firstName:
-          type: string
-          example: Akshay
-        lastName:
-          type: string
-          example: Dev
-        roles:
-          type: array
-          items:
-            $ref: '#/components/schemas/Role'
-        enabled:
-          type: boolean
-          example: true
-        createdAt:
-          type: string
-          format: date-time
-          example: "2026-08-22T12:36:03"
-
     CreateTrendRequestDto:
       type: object
       required:
@@ -461,12 +253,6 @@ components:
         - GITHUB
         - HUGGING_FACE
 
-    Role:
-      type: string
-      enum:
-        - ROLE_USER
-        - ROLE_ADMIN
-
     ProblemDetail:
       type: object
       properties:
@@ -481,7 +267,7 @@ components:
           example: 400
         detail:
           type: string
-          example: Email is required
+          example: Search failed
         timestamp:
           type: string
           format: date-time
