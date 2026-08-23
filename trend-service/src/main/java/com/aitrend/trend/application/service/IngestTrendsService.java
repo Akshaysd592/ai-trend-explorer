@@ -1,5 +1,6 @@
 package com.aitrend.trend.application.service;
 
+import com.aitrend.trend.application.event.IngestionCompletedEvent;
 import com.aitrend.trend.application.port.in.IngestTrendsUseCase;
 import com.aitrend.trend.application.port.in.IngestionResult;
 import com.aitrend.trend.application.port.out.FetchGitHubTrendsPort;
@@ -9,9 +10,11 @@ import com.aitrend.trend.domain.model.Trend;
 import com.aitrend.trend.domain.service.TrendScoringCalculator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -23,15 +26,18 @@ public class IngestTrendsService implements IngestTrendsUseCase {
     private final FetchHuggingFaceTrendsPort huggingFaceTrendsPort;
     private final TrendRepositoryPort trendRepositoryPort;
     private final TrendScoringCalculator scoringCalculator;
+    private final ApplicationEventPublisher eventPublisher;
 
     public IngestTrendsService(FetchGitHubTrendsPort gitHubTrendsPort,
                                FetchHuggingFaceTrendsPort huggingFaceTrendsPort,
                                TrendRepositoryPort trendRepositoryPort,
-                               TrendScoringCalculator scoringCalculator) {
+                               TrendScoringCalculator scoringCalculator,
+                               ApplicationEventPublisher eventPublisher) {
         this.gitHubTrendsPort = gitHubTrendsPort;
         this.huggingFaceTrendsPort = huggingFaceTrendsPort;
         this.trendRepositoryPort = trendRepositoryPort;
         this.scoringCalculator = scoringCalculator;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -40,24 +46,30 @@ public class IngestTrendsService implements IngestTrendsUseCase {
 
         List<Trend> githubTrends = gitHubTrendsPort.fetchTrendingRepositories();
         List<Trend> huggingFaceTrends = huggingFaceTrendsPort.fetchTrendingModels();
+        List<Trend> savedTrendsList = new ArrayList<>();
 
         int savedGithub = 0;
         for (Trend rawTrend : githubTrends) {
             Trend scored = scoringCalculator.applyScoring(rawTrend);
-            trendRepositoryPort.save(scored);
+            Trend saved = trendRepositoryPort.save(scored);
+            savedTrendsList.add(saved);
             savedGithub++;
         }
 
         int savedHuggingFace = 0;
         for (Trend rawTrend : huggingFaceTrends) {
             Trend scored = scoringCalculator.applyScoring(rawTrend);
-            trendRepositoryPort.save(scored);
+            Trend saved = trendRepositoryPort.save(scored);
+            savedTrendsList.add(saved);
             savedHuggingFace++;
         }
 
         int totalSaved = savedGithub + savedHuggingFace;
         log.info("Ingestion completed. Total items persisted: {} (GitHub: {}, HuggingFace: {})",
                 totalSaved, savedGithub, savedHuggingFace);
+
+        // Publish event to trigger async AI enrichment pipeline
+        eventPublisher.publishEvent(new IngestionCompletedEvent(savedTrendsList));
 
         return new IngestionResult(totalSaved, savedGithub, savedHuggingFace, Instant.now());
     }
