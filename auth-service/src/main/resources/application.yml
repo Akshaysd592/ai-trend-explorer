@@ -33,7 +33,7 @@ springdoc:
     tags-sorter: alpha
 
 jwt:
-  secret: ${JWT_SECRET:aiTrendExplorerSuperSecretKeyThatIsAtLeast256BitsLongForHMACSHA256}
+  secret: ${JWT_SECRET}
   expiration:
     access-token-ms: 900000     # 15 minutes
     refresh-token-ms: 604800000  # 7 days
