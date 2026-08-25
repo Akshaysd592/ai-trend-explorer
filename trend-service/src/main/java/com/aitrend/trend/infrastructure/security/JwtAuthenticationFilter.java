@@ -39,7 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final SecretKey secretKey;
 
     public JwtAuthenticationFilter(
-            @Value("${jwt.secret:aiTrendExplorerSuperSecretKeyThatIsAtLeast256BitsLongForHMACSHA256}") String secret
+            @Value("${jwt.secret}") String secret
     ) {
         this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }

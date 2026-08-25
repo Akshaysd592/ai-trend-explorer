@@ -25,7 +25,7 @@ public class JwtTokenAdapter implements TokenProviderPort {
     private final long refreshTokenExpirationMs;
 
     public JwtTokenAdapter(
-            @Value("${jwt.secret:aiTrendExplorerSuperSecretKeyThatIsAtLeast256BitsLongForHMACSHA256}") String secret,
+            @Value("${jwt.secret}") String secret,
             @Value("${jwt.expiration.access-token-ms:900000}") long accessTokenExpirationMs, // 15 mins
             @Value("${jwt.expiration.refresh-token-ms:604800000}") long refreshTokenExpirationMs // 7 days
     ) {

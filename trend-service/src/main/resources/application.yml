@@ -6,9 +6,9 @@ spring:
     name: trend-service
   
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/trend_db}
-    username: ${SPRING_DATASOURCE_USERNAME:postgres}
-    password: ${SPRING_DATASOURCE_PASSWORD:postgrespassword}
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -24,12 +24,22 @@ spring:
     change-log: classpath:db/changelog/db.changelog-master.yaml
     enabled: true
 
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+  cache:
+    type: redis
+    redis:
+      time-to-live: 300000  # 5 minutes in milliseconds
+
 gemini:
   api-key: ${GEMINI_API_KEY:}
   model: ${GEMINI_MODEL:gemini-3.5-flash-lite}
 
 jwt:
-  secret: ${JWT_SECRET:aiTrendExplorerSuperSecretKeyThatIsAtLeast256BitsLongForHMACSHA256}
+  secret: ${JWT_SECRET}
 
 springdoc:
   api-docs:
