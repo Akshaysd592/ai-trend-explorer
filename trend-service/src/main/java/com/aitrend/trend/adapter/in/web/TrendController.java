@@ -1,5 +1,6 @@
 package com.aitrend.trend.adapter.in.web;
 
+import com.aitrend.trend.adapter.in.web.dto.UpdateAiMetadataRequest;
 import com.aitrend.trend.application.port.in.*;
 import com.aitrend.trend.domain.model.Trend;
 import com.aitrend.trend.infrastructure.openapi.api.TrendsApi;
@@ -84,6 +85,15 @@ public class TrendController implements TrendsApi {
         );
         Trend domain = trendUseCase.createTrend(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(toResponseDto(domain));
+    }
+
+    @PatchMapping("/{id}/ai-metadata")
+    public ResponseEntity<TrendResponseDto> updateAiMetadata(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateAiMetadataRequest request
+    ) {
+        Trend domain = trendUseCase.updateAiMetadata(id, request.aiCategory(), request.aiSummary());
+        return ResponseEntity.ok(toResponseDto(domain));
     }
 
     @Override

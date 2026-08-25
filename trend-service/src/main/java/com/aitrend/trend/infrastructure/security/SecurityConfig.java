@@ -14,10 +14,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * Security configuration for trend-service.
  *
  * Access Rules:
- * - GET  /api/v1/trends/**       → Public (no auth required — frontend reads freely)
- * - POST /api/v1/trends/ingest   → Protected (requires valid JWT — admin operation)
- * - POST /api/v1/trends          → Protected (requires valid JWT)
- * - Swagger UI / actuator        → Public
+ * - GET   /api/v1/trends/**          -> Public (no auth required - frontend reads freely)
+ * - PATCH /api/v1/trends/{id}/ai-metadata -> Public / Inter-service communication from ai-analysis-service
+ * - POST  /api/v1/trends/ingest      -> Protected (requires valid JWT - admin operation)
+ * - POST  /api/v1/trends             -> Protected (requires valid JWT)
+ * - Swagger UI / actuator            -> Public
  */
 @Configuration
 @EnableWebSecurity
@@ -54,6 +55,9 @@ public class SecurityConfig {
 
                 // Read trends — public (frontend displays without login)
                 .requestMatchers(HttpMethod.GET, "/api/v1/trends/**").permitAll()
+
+                // Inter-service update for AI metadata
+                .requestMatchers(HttpMethod.PATCH, "/api/v1/trends/**").permitAll()
 
                 // Write/admin operations — require valid JWT
                 .requestMatchers(HttpMethod.POST, "/api/v1/trends/ingest").authenticated()
