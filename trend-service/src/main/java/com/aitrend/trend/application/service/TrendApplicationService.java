@@ -7,6 +7,8 @@ import com.aitrend.trend.application.port.in.TrendUseCase;
 import com.aitrend.trend.application.port.out.TrendRepositoryPort;
 import com.aitrend.trend.domain.exception.TrendNotFoundException;
 import com.aitrend.trend.domain.model.Trend;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,8 +24,17 @@ public class TrendApplicationService implements TrendUseCase {
         this.trendRepositoryPort = trendRepositoryPort;
     }
 
+    /**
+     * Cached paginated trends query.
+     * Cache key includes all query parameters so each unique filter combination
+     * gets its own cache entry. TTL is 5 minutes (configured in RedisConfig).
+     */
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(
+        value = "trends",
+        key = "#query.page() + '-' + #query.size() + '-' + #query.source() + '-' + #query.language() + '-' + #query.searchKeyword() + '-' + #query.sortBy() + '-' + #query.sortDirection()"
+    )
     public PagedResult<Trend> getTrends(GetTrendsQuery query) {
         return trendRepositoryPort.findTrends(query);
     }
@@ -35,7 +46,12 @@ public class TrendApplicationService implements TrendUseCase {
                 .orElseThrow(() -> new TrendNotFoundException(id));
     }
 
+    /**
+     * Evicts all "trends" cache entries when a new trend is manually created,
+     * so the next GET reflects the latest data immediately.
+     */
     @Override
+    @CacheEvict(value = "trends", allEntries = true)
     public Trend createTrend(CreateTrendCommand command) {
         Trend newTrend = new Trend(
                 null,

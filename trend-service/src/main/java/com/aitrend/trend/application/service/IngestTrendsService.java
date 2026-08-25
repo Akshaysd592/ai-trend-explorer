@@ -9,6 +9,7 @@ import com.aitrend.trend.domain.model.Trend;
 import com.aitrend.trend.domain.service.TrendScoringCalculator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -35,6 +36,7 @@ public class IngestTrendsService implements IngestTrendsUseCase {
     }
 
     @Override
+    @CacheEvict(value = "trends", allEntries = true)
     public IngestionResult ingestTrends() {
         log.info("Starting multi-platform AI trend ingestion process...");
 
