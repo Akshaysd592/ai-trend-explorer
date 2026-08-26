@@ -71,4 +71,34 @@ public class TrendApplicationService implements TrendUseCase {
         );
         return trendRepositoryPort.save(newTrend);
     }
+
+    /**
+     * Updates AI metadata (category & summary) for an existing trend entity,
+     * and evicts the Redis trend cache to reflect enriched data immediately.
+     */
+    @Override
+    @CacheEvict(value = "trends", allEntries = true)
+    public Trend updateAiMetadata(Long id, String aiCategory, String aiSummary) {
+        Trend existing = trendRepositoryPort.findById(id)
+                .orElseThrow(() -> new TrendNotFoundException(id));
+
+        Trend updated = new Trend(
+                existing.getId(),
+                existing.getTitle(),
+                existing.getDescription(),
+                existing.getRepositoryUrl(),
+                existing.getSource(),
+                existing.getStars(),
+                existing.getForks(),
+                existing.getLanguage(),
+                existing.getTopics(),
+                existing.getTrendScore(),
+                aiCategory,
+                aiSummary,
+                existing.getCreatedAt(),
+                LocalDateTime.now()
+        );
+
+        return trendRepositoryPort.save(updated);
+    }
 }

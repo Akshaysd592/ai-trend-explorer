@@ -5,6 +5,7 @@ import com.aitrend.trend.application.port.in.IngestTrendsUseCase;
 import com.aitrend.trend.application.port.in.IngestionResult;
 import com.aitrend.trend.application.port.out.FetchGitHubTrendsPort;
 import com.aitrend.trend.application.port.out.FetchHuggingFaceTrendsPort;
+import com.aitrend.trend.application.port.out.TrendEventPublisherPort;
 import com.aitrend.trend.application.port.out.TrendRepositoryPort;
 import com.aitrend.trend.domain.model.Trend;
 import com.aitrend.trend.domain.service.TrendScoringCalculator;
@@ -27,18 +28,21 @@ public class IngestTrendsService implements IngestTrendsUseCase {
     private final FetchHuggingFaceTrendsPort huggingFaceTrendsPort;
     private final TrendRepositoryPort trendRepositoryPort;
     private final TrendScoringCalculator scoringCalculator;
-    private final ApplicationEventPublisher eventPublisher;
+    private final TrendEventPublisherPort kafkaEventPublisher;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public IngestTrendsService(FetchGitHubTrendsPort gitHubTrendsPort,
                                FetchHuggingFaceTrendsPort huggingFaceTrendsPort,
                                TrendRepositoryPort trendRepositoryPort,
                                TrendScoringCalculator scoringCalculator,
-                               ApplicationEventPublisher eventPublisher) {
+                               TrendEventPublisherPort kafkaEventPublisher,
+                               ApplicationEventPublisher applicationEventPublisher) {
         this.gitHubTrendsPort = gitHubTrendsPort;
         this.huggingFaceTrendsPort = huggingFaceTrendsPort;
         this.trendRepositoryPort = trendRepositoryPort;
         this.scoringCalculator = scoringCalculator;
-        this.eventPublisher = eventPublisher;
+        this.kafkaEventPublisher = kafkaEventPublisher;
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
     @Override
@@ -55,6 +59,7 @@ public class IngestTrendsService implements IngestTrendsUseCase {
             Trend scored = scoringCalculator.applyScoring(rawTrend);
             Trend saved = trendRepositoryPort.save(scored);
             savedTrendsList.add(saved);
+            kafkaEventPublisher.publishTrendIngestedEvent(saved);
             savedGithub++;
         }
 
@@ -63,6 +68,7 @@ public class IngestTrendsService implements IngestTrendsUseCase {
             Trend scored = scoringCalculator.applyScoring(rawTrend);
             Trend saved = trendRepositoryPort.save(scored);
             savedTrendsList.add(saved);
+            kafkaEventPublisher.publishTrendIngestedEvent(saved);
             savedHuggingFace++;
         }
 
@@ -70,8 +76,8 @@ public class IngestTrendsService implements IngestTrendsUseCase {
         log.info("Ingestion completed. Total items persisted: {} (GitHub: {}, HuggingFace: {})",
                 totalSaved, savedGithub, savedHuggingFace);
 
-        // Publish event to trigger async AI enrichment pipeline
-        eventPublisher.publishEvent(new IngestionCompletedEvent(savedTrendsList));
+        // Publish local spring event as well for local listeners
+        applicationEventPublisher.publishEvent(new IngestionCompletedEvent(savedTrendsList));
 
         return new IngestionResult(totalSaved, savedGithub, savedHuggingFace, Instant.now());
     }

@@ -34,6 +34,26 @@ spring:
     redis:
       time-to-live: 300000  # 5 minutes in milliseconds
 
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: true
+    consumer:
+      group-id: trend-enrichment-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "com.aitrend.*"
+
+app:
+  kafka:
+    topics:
+      trend-ingested: ${KAFKA_TOPIC_TREND_INGESTED:ai.trends.ingested}
+
 gemini:
   api-key: ${GEMINI_API_KEY:}
   model: ${GEMINI_MODEL:gemini-3.5-flash-lite}

@@ -11,12 +11,16 @@ import org.springframework.test.context.TestPropertySource;
     "spring.datasource.username=sa",
     "spring.datasource.password=",
     "spring.jpa.hibernate.ddl-auto=create-drop",
-    "spring.liquibase.enabled=true"
+    "spring.liquibase.enabled=true",
+    "spring.cache.type=none",
+    "spring.kafka.listener.auto-startup=false",
+    "spring.kafka.admin.auto-create=false",
+    "jwt.secret=aiTrendExplorerSuperSecretKeyThatIsAtLeast256BitsLongForHMACSHA256"
 })
 class TrendServiceApplicationTests {
 
     @Test
     void contextLoads() {
-        // Verifies Spring context, Liquibase migration, and JPA entities load cleanly
+        // Verifies Spring context, Liquibase migration, Kafka and JPA entities load cleanly
     }
 }

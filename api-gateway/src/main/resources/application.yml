@@ -16,6 +16,7 @@ spring:
               - GET
               - POST
               - PUT
+              - PATCH
               - DELETE
               - OPTIONS
             allowedHeaders: "*"
@@ -41,6 +42,16 @@ spring:
             - Path=/v3/api-docs/trends/**
           filters:
             - RewritePath=/v3/api-docs/trends(?<segment>/?.*), /v3/api-docs$\{segment}
+        - id: ai-analysis-service
+          uri: ${AI_ANALYSIS_SERVICE_URL:http://localhost:8083}
+          predicates:
+            - Path=/api/v1/analysis/**
+        - id: ai-analysis-docs
+          uri: ${AI_ANALYSIS_SERVICE_URL:http://localhost:8083}
+          predicates:
+            - Path=/v3/api-docs/analysis/**
+          filters:
+            - RewritePath=/v3/api-docs/analysis(?<segment>/?.*), /v3/api-docs$\{segment}
 
 management:
   endpoints:
