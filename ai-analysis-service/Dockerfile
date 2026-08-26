@@ -2,14 +2,13 @@
 FROM gradle:8.9-jdk21-alpine AS builder
 
 WORKDIR /app
-COPY gradlew gradlew.bat settings.gradle build.gradle ./
+COPY settings.gradle build.gradle ./
 COPY gradle/ gradle/
-RUN chmod +x gradlew
 
-RUN ./gradlew dependencies --no-daemon -q || true
+RUN gradle dependencies --no-daemon -q || true
 
 COPY src/ src/
-RUN ./gradlew bootJar --no-daemon -q
+RUN gradle bootJar --no-daemon -q
 
 # ── Stage 2: Runtime ────────────────────────────────────────────────────────────
 FROM eclipse-temurin:21-jre-alpine AS runtime
