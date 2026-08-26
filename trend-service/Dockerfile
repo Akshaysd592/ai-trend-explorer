@@ -1,5 +1,4 @@
 # ── Stage 1: Build ─────────────────────────────────────────────────────────────
-# trend-service uses openApiGenerate task — runs automatically via compileJava.dependsOn
 FROM gradle:8.9-jdk21-alpine AS builder
 
 WORKDIR /app
@@ -9,7 +8,7 @@ COPY gradle/ gradle/
 RUN gradle dependencies --no-daemon -q || true
 
 COPY src/ src/
-RUN gradle bootJar --no-daemon -q
+RUN gradle bootJar --no-daemon -x test --parallel
 
 # ── Stage 2: Runtime ────────────────────────────────────────────────────────────
 FROM eclipse-temurin:21-jre-alpine AS runtime

@@ -1,5 +1,8 @@
 package com.aitrend.trend.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -20,10 +23,23 @@ public class Trend {
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
 
-    public Trend(Long id, String title, String description, String repositoryUrl,
-                 SourceType source, Integer stars, Integer forks, String language,
-                 List<String> topics, Double trendScore, String aiCategory,
-                 String aiSummary, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    @JsonCreator
+    public Trend(
+            @JsonProperty("id") Long id,
+            @JsonProperty("title") String title,
+            @JsonProperty("description") String description,
+            @JsonProperty("repositoryUrl") String repositoryUrl,
+            @JsonProperty("source") SourceType source,
+            @JsonProperty("stars") Integer stars,
+            @JsonProperty("forks") Integer forks,
+            @JsonProperty("language") String language,
+            @JsonProperty("topics") List<String> topics,
+            @JsonProperty("trendScore") Double trendScore,
+            @JsonProperty("aiCategory") String aiCategory,
+            @JsonProperty("aiSummary") String aiSummary,
+            @JsonProperty("createdAt") LocalDateTime createdAt,
+            @JsonProperty("updatedAt") LocalDateTime updatedAt
+    ) {
         this.id = id;
         this.title = Objects.requireNonNull(title, "Title cannot be null");
         this.description = description;

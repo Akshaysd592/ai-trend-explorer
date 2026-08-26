@@ -1,18 +1,14 @@
 # ── Stage 1: Build ─────────────────────────────────────────────────────────────
-# Use gradle image directly — no ./gradlew needed (avoids CRLF issues on Windows hosts)
 FROM gradle:8.9-jdk21-alpine AS builder
 
 WORKDIR /app
-# Copy only dependency files first for layer caching
 COPY settings.gradle build.gradle ./
 COPY gradle/ gradle/
 
-# Cache dependencies
 RUN gradle dependencies --no-daemon -q || true
 
-# Copy source and build
 COPY src/ src/
-RUN gradle bootJar --no-daemon -q
+RUN gradle bootJar --no-daemon -x test --parallel
 
 # ── Stage 2: Runtime ────────────────────────────────────────────────────────────
 FROM eclipse-temurin:21-jre-alpine AS runtime

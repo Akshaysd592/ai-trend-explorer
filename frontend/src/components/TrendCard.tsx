@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { Trend } from '@/types/trend';
 import { Star, GitFork, ExternalLink, Sparkles, Code, Cpu } from 'lucide-react';
 
@@ -10,6 +11,8 @@ interface TrendCardProps {
 }
 
 export const TrendCard: React.FC<TrendCardProps> = ({ trend, viewMode }) => {
+  const router = useRouter();
+
   const getSourceBadge = () => {
     switch (trend.source) {
       case 'GITHUB':
@@ -33,13 +36,28 @@ export const TrendCard: React.FC<TrendCardProps> = ({ trend, viewMode }) => {
     }
   };
 
+  const handleCardClick = () => {
+    router.push(`/trends/${trend.id}`);
+  };
+
   if (viewMode === 'list') {
     return (
-      <div className="bg-slate-900/90 border border-slate-800 hover:border-slate-700 rounded-xl p-5 transition-all duration-200 hover:shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div
+        onClick={handleCardClick}
+        role="link"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleCardClick();
+          }
+        }}
+        className="bg-slate-900/90 border border-slate-800 hover:border-cyan-500/60 rounded-xl p-5 transition-all duration-200 hover:shadow-lg hover:shadow-cyan-500/5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 cursor-pointer group select-none"
+      >
         <div className="space-y-2 flex-1">
           <div className="flex items-center space-x-3">
             {getSourceBadge()}
-            <h3 className="text-lg font-bold text-slate-100 hover:text-cyan-400 transition-colors">
+            <h3 className="text-lg font-bold text-slate-100 group-hover:text-cyan-400 transition-colors">
               {trend.title}
             </h3>
             {trend.language && (
@@ -80,8 +98,9 @@ export const TrendCard: React.FC<TrendCardProps> = ({ trend, viewMode }) => {
             href={trend.repositoryUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="p-2 bg-slate-800 hover:bg-slate-700 text-cyan-400 hover:text-white rounded-lg transition-colors border border-slate-700"
-            title="Open Repository"
+            onClick={(e) => e.stopPropagation()}
+            className="p-2 bg-slate-800 hover:bg-cyan-500 hover:text-slate-950 text-cyan-400 rounded-lg transition-all border border-slate-700"
+            title="Open Original Repository in New Tab"
           >
             <ExternalLink className="h-4 w-4" />
           </a>
@@ -91,7 +110,18 @@ export const TrendCard: React.FC<TrendCardProps> = ({ trend, viewMode }) => {
   }
 
   return (
-    <div className="bg-slate-900/90 border border-slate-800 hover:border-cyan-500/50 rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:shadow-cyan-500/5 flex flex-col justify-between space-y-4 group">
+    <div
+      onClick={handleCardClick}
+      role="link"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleCardClick();
+        }
+      }}
+      className="bg-slate-900/90 border border-slate-800 hover:border-cyan-500/60 rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:shadow-cyan-500/10 hover:-translate-y-0.5 flex flex-col justify-between space-y-4 group cursor-pointer select-none"
+    >
       <div className="space-y-3">
         {/* Top Badges & Trend Score */}
         <div className="flex items-center justify-between">
@@ -140,7 +170,7 @@ export const TrendCard: React.FC<TrendCardProps> = ({ trend, viewMode }) => {
         )}
       </div>
 
-      {/* Card Footer Metrics & Link */}
+      {/* Card Footer Metrics & Direct Source Link */}
       <div className="pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
         <div className="flex items-center space-x-4">
           <span className="flex items-center space-x-1">
@@ -165,9 +195,11 @@ export const TrendCard: React.FC<TrendCardProps> = ({ trend, viewMode }) => {
           href={trend.repositoryUrl}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
           className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-cyan-500 hover:text-slate-950 text-cyan-400 font-semibold transition-all duration-200 border border-slate-700"
+          title="Open Original Repository in New Tab"
         >
-          <span>View</span>
+          <span>Source</span>
           <ExternalLink className="h-3.5 w-3.5" />
         </a>
       </div>

@@ -1,11 +1,4 @@
-# ── Stage 1: Dependencies ──────────────────────────────────────────────────────
-FROM node:20-alpine AS deps
-
-WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm ci --only=production
-
-# ── Stage 2: Builder ───────────────────────────────────────────────────────────
+# ── Stage 1: Build ─────────────────────────────────────────────────────────────
 FROM node:20-alpine AS builder
 
 WORKDIR /app
@@ -14,28 +7,30 @@ RUN npm ci
 
 COPY . .
 
-# Build the Next.js production bundle
+# Build the Next.js production standalone bundle
 ARG NEXT_PUBLIC_API_URL=http://localhost:8080
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 
 RUN npm run build
 
-# ── Stage 3: Runtime ───────────────────────────────────────────────────────────
+# ── Stage 2: Production Runtime ────────────────────────────────────────────────
 FROM node:20-alpine AS runtime
 
 WORKDIR /app
 ENV NODE_ENV=production
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 
-# Copy built output and prod dependencies
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/package.json ./package.json
-COPY --from=deps /app/node_modules ./node_modules
-
-# Non-root user
+# Non-root user for security
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+# Copy standalone server and static assets
+COPY --from=builder --chown=appuser:appgroup /app/.next/standalone ./
+COPY --from=builder --chown=appuser:appgroup /app/.next/static ./.next/static
+COPY --from=builder --chown=appuser:appgroup /app/public ./public
+
 USER appuser
 
 EXPOSE 3000
 
-CMD ["node_modules/.bin/next", "start", "-p", "3000"]
+CMD ["node", "server.js"]

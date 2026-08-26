@@ -8,7 +8,7 @@ COPY gradle/ gradle/
 RUN gradle dependencies --no-daemon -q || true
 
 COPY src/ src/
-RUN gradle bootJar --no-daemon -q
+RUN gradle bootJar --no-daemon -x test --parallel
 
 # ── Stage 2: Runtime ────────────────────────────────────────────────────────────
 FROM eclipse-temurin:21-jre-alpine AS runtime
