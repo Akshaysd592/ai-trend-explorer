@@ -1,0 +1,12 @@
+.gradle
+build
+out
+*.class
+.git
+.idea
+*.iml
+gradlew
+gradlew.bat
+README.md
+Dockerfile
+.dockerignore

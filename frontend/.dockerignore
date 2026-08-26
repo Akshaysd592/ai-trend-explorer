@@ -1,0 +1,8 @@
+node_modules
+.next
+.git
+.idea
+*.log
+Dockerfile
+.dockerignore
+README.md
