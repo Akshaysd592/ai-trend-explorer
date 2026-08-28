@@ -1,0 +1,53 @@
+name: Docker Containers Build Check
+
+on:
+  push:
+    branches:
+      - main
+      - 'feature/**'
+    paths:
+      - '**/Dockerfile'
+      - 'docker-compose.yml'
+      - '.github/workflows/docker-ci.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '**/Dockerfile'
+      - 'docker-compose.yml'
+      - '.github/workflows/docker-ci.yml'
+
+concurrency:
+  group: docker-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docker-build-matrix:
+    name: Build Image (${{ matrix.service }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - api-gateway
+          - auth-service
+          - trend-service
+          - ai-analysis-service
+          - frontend
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Validate Multi-Stage Docker Build
+        uses: docker/build-push-action@v5
+        with:
+          context: ./${{ matrix.service }}
+          file: ./${{ matrix.service }}/Dockerfile
+          push: false
+          tags: ai-trend-explorer-${{ matrix.service }}:ci-test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

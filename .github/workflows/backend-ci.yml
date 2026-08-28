@@ -1,0 +1,72 @@
+name: Backend Microservices CI
+
+on:
+  push:
+    branches:
+      - main
+      - 'feature/**'
+    paths:
+      - 'api-gateway/**'
+      - 'auth-service/**'
+      - 'trend-service/**'
+      - 'ai-analysis-service/**'
+      - '.github/workflows/backend-ci.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'api-gateway/**'
+      - 'auth-service/**'
+      - 'trend-service/**'
+      - 'ai-analysis-service/**'
+      - '.github/workflows/backend-ci.yml'
+
+concurrency:
+  group: backend-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend-test-and-build:
+    name: Test & Build (${{ matrix.service }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - api-gateway
+          - auth-service
+          - trend-service
+          - ai-analysis-service
+
+    env:
+      JWT_SECRET: ${{ secrets.JWT_SECRET || 'test-jwt-secret-for-ci-builds-min-256-bit-long-string-key-404E635266556A' }}
+      SPRING_DATASOURCE_URL: 'jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL'
+      SPRING_DATASOURCE_USERNAME: 'sa'
+      SPRING_DATASOURCE_PASSWORD: ''
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || 'dummy-ci-gemini-key' }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+
+      - name: Grant execute permission for gradlew
+        run: |
+          cd ${{ matrix.service }}
+          chmod +x gradlew || true
+
+      - name: Run Unit & Integration Tests
+        run: |
+          cd ${{ matrix.service }}
+          ./gradlew test --no-daemon
+
+      - name: Package Executable Boot JAR
+        run: |
+          cd ${{ matrix.service }}
+          ./gradlew bootJar --no-daemon -x test

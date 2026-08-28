@@ -282,7 +282,7 @@ export default function TrendDetailsPage({ params }: TrendDetailsPageProps) {
                     <p className="italic">{trend.aiSummary}</p>
                   ) : (
                     <p className="text-slate-500 italic">
-                      No automated summary generated yet. Click "Re-run AI Analysis" above to trigger a Gemini analysis.
+                      No automated summary generated yet. Click <span className="font-semibold text-purple-400 not-italic">Re-run AI Analysis</span> above to trigger a Gemini analysis.
                     </p>
                   )}
                 </div>
