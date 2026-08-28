@@ -11,7 +11,8 @@ import org.springframework.test.context.TestPropertySource;
     "spring.datasource.username=sa",
     "spring.datasource.password=",
     "spring.jpa.hibernate.ddl-auto=create-drop",
-    "spring.liquibase.enabled=true"
+    "spring.liquibase.enabled=true",
+    "jwt.secret=404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970337336763979244226452948404D6351655468576D5A7134743777217A25432A"
 })
 class AuthServiceApplicationTests {
 
