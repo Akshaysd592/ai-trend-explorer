@@ -8,6 +8,8 @@
 [![PostgreSQL 16](https://img.shields.io/badge/PostgreSQL-16-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Google Gemini](https://img.shields.io/badge/Gemini%20AI-3.5%20Flash%20Lite-8E75C2?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
 [![Docker Compose](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
+[![Author](https://img.shields.io/badge/Author-Akshay-blue?style=for-the-badge&logo=github)](https://github.com/Akshaysd592)
 
 > **An enterprise-grade, event-driven microservices platform designed to discover, aggregate, score, and AI-enrich trending open-source AI repositories and models in real time.**
 
@@ -26,6 +28,8 @@
 - [Environment Configuration Matrix](#-environment-configuration-matrix)
 - [Testing & Quality Assurance](#-testing--quality-assurance)
 - [CI/CD Pipeline](#-cicd-pipeline)
+- [Author & Maintainer](#-author--maintainer)
+- [License](#-license)
 
 ---
 
@@ -314,6 +318,16 @@ flowchart LR
 
 ---
 
+## 👨‍💻 Author & Maintainer
+
+**Akshay**
+- GitHub: [@Akshaysd592](https://github.com/Akshaysd592)
+- Repository: [ai-trend-explorer](https://github.com/Akshaysd592/ai-trend-explorer)
+
+---
+
 ## 📄 License
 
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **MIT License** — Copyright © 2026 **Akshay** ([@Akshaysd592](https://github.com/Akshaysd592)).
+
+See the full [LICENSE](LICENSE) file for terms of use and distribution permissions.
