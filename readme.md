@@ -300,21 +300,24 @@ npm run build
 
 ---
 
-## 🔁 CI/CD Pipeline
+## 🔁 CI/CD Pipelines (Separated & Path-Filtered)
 
-The project includes an enterprise **GitHub Actions** CI workflow (`.github/workflows/ci.yml`) that validates every Pull Request and commit to `main`:
+The project uses modular, path-filtered **GitHub Actions** CI workflows to ensure fast, isolated feedback loops without wasting runner minutes:
+
+| Workflow | Path Triggers | Description |
+|---|---|---|
+| ☕ **[`backend-ci.yml`](.github/workflows/backend-ci.yml)** | `api-gateway/**`, `auth-service/**`, `trend-service/**`, `ai-analysis-service/**` | Parallel matrix build, dependency caching, and unit testing across all 4 Java 21 Spring Boot services. |
+| ⚡ **[`frontend-ci.yml`](.github/workflows/frontend-ci.yml)** | `frontend/**` | Node.js 20 build pipeline executing `npm run lint` and standalone Next.js 15 compilation. |
+| 🐳 **[`docker-ci.yml`](.github/workflows/docker-ci.yml)** | `**/Dockerfile`, `docker-compose.yml` | Multi-stage Docker image build validation across all 5 application services. |
 
 ```mermaid
 flowchart LR
-    A[Push / PR] --> B[Backend CI Matrix<br/>Java 21 / Gradle Test]
-    A --> C[Frontend CI<br/>Node 20 / Lint / Build]
-    B --> D[Docker Build Validation<br/>5 Multi-Stage Images]
-    C --> D
+    subgraph Triggers["Path-Filtered Triggers"]
+        B_CHG["Backend Changes"] --> B_CI["backend-ci.yml<br/>Java 21 / Gradle Matrix"]
+        F_CHG["Frontend Changes"] --> F_CI["frontend-ci.yml<br/>Node 20 / Lint / Build"]
+        D_CHG["Docker Changes"] --> D_CI["docker-ci.yml<br/>Buildx Image Matrix"]
+    end
 ```
-
-- **Backend CI Matrix**: Parallel build and unit testing across all 4 Spring Boot microservices with Gradle build caching.
-- **Frontend CI**: TypeScript verification, ESLint auditing, and Next.js standalone build generation.
-- **Docker Validation**: Multi-stage image build checks for all services.
 
 ---
 
