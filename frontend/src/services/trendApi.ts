@@ -1,7 +1,21 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { GetTrendsParams, PagedResult, Trend } from '@/types/trend';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
+function getApiBaseUrl(): string {
+  const url = process.env.NEXT_PUBLIC_API_URL;
+  if (!url || url.trim() === '') {
+    return '';
+  }
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url.endsWith('/') ? url.slice(0, -1) : url;
+  }
+  if (url.includes('.onrender.com') || url.includes('.')) {
+    return `https://${url.endsWith('/') ? url.slice(0, -1) : url}`;
+  }
+  return '';
+}
+
+const API_BASE_URL = getApiBaseUrl();
 
 export async function fetchTrends(params: GetTrendsParams): Promise<PagedResult<Trend>> {
   const queryParams = new URLSearchParams();
