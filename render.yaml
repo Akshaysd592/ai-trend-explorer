@@ -1,9 +1,17 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # AI Trend Explorer — Render Infrastructure as Code (Blueprint)
 # 100% Free Plan Compatible (Uses type: web & Free PostgreSQL + Redis)
-# Security: Zero Hardcoded Secrets (Parameter-Driven)
+# Security: Zero Hardcoded Secrets (Env Var Groups)
 # Cost: $0.00 / month
 # ─────────────────────────────────────────────────────────────────────────────
+
+envVarGroups:
+  - name: ai-shared-secrets
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false # Prompts securely once in Render UI at deploy time
+      - key: GEMINI_MODEL
+        value: models/gemini-3.5-flash-lite
 
 databases:
   # ── 1. PostgreSQL Database (Free Tier) ─────────────────────────────────────
@@ -62,12 +70,9 @@ services:
     plan: free
     region: oregon
     envVars:
+      - fromGroup: ai-shared-secrets
       - key: TREND_SERVICE_URL
         value: http://trend-service:10000
-      - key: GEMINI_API_KEY
-        sync: false # Prompts securely in Render UI at deploy time
-      - key: GEMINI_MODEL
-        value: models/gemini-3.5-flash-lite
 
   # ── 5. Trend Microservice (Web Service) ────────────────────────────────────
   - type: web
@@ -78,6 +83,7 @@ services:
     plan: free
     region: oregon
     envVars:
+      - fromGroup: ai-shared-secrets
       - key: DB_HOST
         fromDatabase:
           name: ai-trend-db
@@ -113,13 +119,6 @@ services:
           type: web
           name: auth-service
           envVarKey: JWT_SECRET
-      - key: GEMINI_API_KEY
-        fromService:
-          type: web
-          name: ai-analysis-service
-          envVarKey: GEMINI_API_KEY
-      - key: GEMINI_MODEL
-        value: models/gemini-3.5-flash-lite
       - key: AI_ANALYSIS_SERVICE_URL
         value: http://ai-analysis-service:10000
 
