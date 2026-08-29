@@ -4,10 +4,22 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   output: "standalone",
   async rewrites() {
-    const gatewayUrl =
+    let rawUrl =
       process.env.API_GATEWAY_URL ||
       process.env.NEXT_PUBLIC_API_URL ||
       "http://localhost:8080";
+
+    // Ensure rawUrl has a valid http://, https://, or / prefix for Next.js validation
+    if (
+      !rawUrl.startsWith("http://") &&
+      !rawUrl.startsWith("https://") &&
+      !rawUrl.startsWith("/")
+    ) {
+      rawUrl = `http://${rawUrl}:10000`;
+    }
+
+    const gatewayUrl = rawUrl.endsWith("/") ? rawUrl.slice(0, -1) : rawUrl;
+
     return [
       {
         source: "/api/v1/:path*",
