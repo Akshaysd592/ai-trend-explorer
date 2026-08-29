@@ -1,7 +1,7 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # AI Trend Explorer — Render Infrastructure as Code (Blueprint)
 # 100% Free Plan Compatible (Uses type: web & Free PostgreSQL + Redis)
-# Security: Zero Hardcoded Secrets (Env Var Groups & Dynamic Proxy Routing)
+# Security: Zero Hardcoded Secrets (Env Var Groups)
 # Cost: $0.00 / month
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -147,11 +147,6 @@ services:
     plan: free
     region: oregon
     envVars:
-      - key: API_GATEWAY_URL
-        fromService:
-          type: web
-          name: api-gateway
-          property: host
       - key: NEXT_PUBLIC_API_URL
         fromService:
           type: web
