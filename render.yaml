@@ -1,7 +1,7 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # AI Trend Explorer — Render Infrastructure as Code (Blueprint)
 # 100% Free Plan Compatible (Uses type: web & Free PostgreSQL + Redis)
-# Security & Architecture: 100% Dynamic Discovery (Zero Hardcoded Hosts/Ports)
+# Security: Zero Hardcoded Secrets (Parameter-Driven)
 # Cost: $0.00 / month
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -62,16 +62,8 @@ services:
     plan: free
     region: oregon
     envVars:
-      - key: TREND_SERVICE_HOST
-        fromService:
-          type: web
-          name: trend-service
-          property: host
-      - key: TREND_SERVICE_PORT
-        fromService:
-          type: web
-          name: trend-service
-          property: port
+      - key: TREND_SERVICE_URL
+        value: http://trend-service:10000
       - key: GEMINI_API_KEY
         sync: false # Prompts securely in Render UI at deploy time
       - key: GEMINI_MODEL
@@ -128,16 +120,8 @@ services:
           envVarKey: GEMINI_API_KEY
       - key: GEMINI_MODEL
         value: models/gemini-3.5-flash-lite
-      - key: AI_ANALYSIS_SERVICE_HOST
-        fromService:
-          type: web
-          name: ai-analysis-service
-          property: host
-      - key: AI_ANALYSIS_SERVICE_PORT
-        fromService:
-          type: web
-          name: ai-analysis-service
-          property: port
+      - key: AI_ANALYSIS_SERVICE_URL
+        value: http://ai-analysis-service:10000
 
   # ── 6. API Gateway (Public Web Service) ────────────────────────────────────
   - type: web
@@ -148,36 +132,12 @@ services:
     plan: free
     region: oregon
     envVars:
-      - key: AUTH_SERVICE_HOST
-        fromService:
-          type: web
-          name: auth-service
-          property: host
-      - key: AUTH_SERVICE_PORT
-        fromService:
-          type: web
-          name: auth-service
-          property: port
-      - key: TREND_SERVICE_HOST
-        fromService:
-          type: web
-          name: trend-service
-          property: host
-      - key: TREND_SERVICE_PORT
-        fromService:
-          type: web
-          name: trend-service
-          property: port
-      - key: AI_ANALYSIS_SERVICE_HOST
-        fromService:
-          type: web
-          name: ai-analysis-service
-          property: host
-      - key: AI_ANALYSIS_SERVICE_PORT
-        fromService:
-          type: web
-          name: ai-analysis-service
-          property: port
+      - key: AUTH_SERVICE_URL
+        value: http://auth-service:10000
+      - key: TREND_SERVICE_URL
+        value: http://trend-service:10000
+      - key: AI_ANALYSIS_SERVICE_URL
+        value: http://ai-analysis-service:10000
 
   # ── 7. Next.js 15 Frontend (Public Web Service) ────────────────────────────
   - type: web
