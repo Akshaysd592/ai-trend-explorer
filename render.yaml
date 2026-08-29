@@ -72,7 +72,10 @@ services:
     envVars:
       - fromGroup: ai-shared-secrets
       - key: TREND_SERVICE_URL
-        value: http://trend-service:10000
+        fromService:
+          type: web
+          name: trend-service
+          property: host
 
   # ── 5. Trend Microservice (Web Service) ────────────────────────────────────
   - type: web
@@ -120,7 +123,10 @@ services:
           name: auth-service
           envVarKey: JWT_SECRET
       - key: AI_ANALYSIS_SERVICE_URL
-        value: http://ai-analysis-service:10000
+        fromService:
+          type: web
+          name: ai-analysis-service
+          property: host
 
   # ── 6. API Gateway (Public Web Service) ────────────────────────────────────
   - type: web
@@ -132,11 +138,20 @@ services:
     region: oregon
     envVars:
       - key: AUTH_SERVICE_URL
-        value: http://auth-service:10000
+        fromService:
+          type: web
+          name: auth-service
+          property: host
       - key: TREND_SERVICE_URL
-        value: http://trend-service:10000
+        fromService:
+          type: web
+          name: trend-service
+          property: host
       - key: AI_ANALYSIS_SERVICE_URL
-        value: http://ai-analysis-service:10000
+        fromService:
+          type: web
+          name: ai-analysis-service
+          property: host
 
   # ── 7. Next.js 15 Frontend (Public Web Service) ────────────────────────────
   - type: web
