@@ -43,7 +43,7 @@ export async function fetchTrends(params: GetTrendsParams): Promise<PagedResult<
   return response.json();
 }
 
-export async function fetchTrendById(id: string): Promise<Trend> {
+export async function fetchTrendById(id: string | number): Promise<Trend> {
   const response = await fetch(`${API_BASE_URL}/api/v1/trends/${id}`, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
@@ -56,7 +56,7 @@ export async function fetchTrendById(id: string): Promise<Trend> {
   return response.json();
 }
 
-export async function triggerAiAnalysis(trendId: string): Promise<Trend> {
+export async function triggerAiAnalysis(trendId: string | number): Promise<Trend> {
   const response = await fetch(`${API_BASE_URL}/api/v1/trends/${trendId}/analyze`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -79,7 +79,7 @@ export function useTrends(params: GetTrendsParams) {
   });
 }
 
-export function useTrend(id: string) {
+export function useTrend(id: string | number) {
   return useQuery({
     queryKey: ['trend', id],
     queryFn: () => fetchTrendById(id),
@@ -90,7 +90,7 @@ export function useTrend(id: string) {
 export function useAnalyzeTrend() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: triggerAiAnalysis,
+    mutationFn: (trendId: string | number) => triggerAiAnalysis(trendId),
     onSuccess: (updatedTrend) => {
       queryClient.invalidateQueries({ queryKey: ['trends'] });
       queryClient.setQueryData(['trend', updatedTrend.id], updatedTrend);
