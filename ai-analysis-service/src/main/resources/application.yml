@@ -1,5 +1,5 @@
 server:
-  port: 8083
+  port: ${PORT:8083}
 
 spring:
   application:
@@ -19,12 +19,14 @@ app:
   kafka:
     topics:
       trend-ingested: ${KAFKA_TOPIC_TREND_INGESTED:ai.trends.ingested}
-  trend-service:
-    url: ${TREND_SERVICE_URL:http://localhost:8081}
 
 gemini:
   api-key: ${GEMINI_API_KEY:}
   model: ${GEMINI_MODEL:gemini-3.5-flash-lite}
+
+services:
+  trend-service:
+    url: ${TREND_SERVICE_URL:http://${TREND_SERVICE_HOST:localhost}:${TREND_SERVICE_PORT:8081}}
 
 springdoc:
   api-docs:
