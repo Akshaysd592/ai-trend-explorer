@@ -1,10 +1,29 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { GetTrendsParams, PagedResult, Trend } from '@/types/trend';
 
-const rawUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
-const API_BASE_URL = rawUrl.startsWith('http://') || rawUrl.startsWith('https://')
-  ? rawUrl.replace(/\/$/, '')
-  : `https://${rawUrl.replace(/\/$/, '')}`;
+function getApiBaseUrl(): string {
+  const url = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080').trim();
+
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    try {
+      const parsed = new URL(url);
+      if (!parsed.hostname.includes('.') && parsed.hostname !== 'localhost') {
+        return `https://${parsed.hostname}.onrender.com`;
+      }
+    } catch {
+      // ignore
+    }
+    return url.replace(/\/$/, '');
+  }
+
+  if (!url.includes('.') && url !== 'localhost') {
+    return `https://${url}.onrender.com`;
+  }
+
+  return `https://${url.replace(/\/$/, '')}`;
+}
+
+const API_BASE_URL = getApiBaseUrl();
 
 export async function fetchTrends(params: GetTrendsParams): Promise<PagedResult<Trend>> {
   const queryParams = new URLSearchParams();
