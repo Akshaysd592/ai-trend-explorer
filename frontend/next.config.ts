@@ -9,13 +9,17 @@ const nextConfig: NextConfig = {
       process.env.NEXT_PUBLIC_API_URL ||
       "http://localhost:8080";
 
-    // Ensure rawUrl has a valid http://, https://, or / prefix for Next.js validation
+    // Normalize URL scheme for Next.js rewrite validation and cloud routing
     if (
       !rawUrl.startsWith("http://") &&
       !rawUrl.startsWith("https://") &&
       !rawUrl.startsWith("/")
     ) {
-      rawUrl = `http://${rawUrl}:10000`;
+      if (rawUrl.includes(".onrender.com")) {
+        rawUrl = `https://${rawUrl}`;
+      } else {
+        rawUrl = `http://${rawUrl}:10000`;
+      }
     }
 
     const gatewayUrl = rawUrl.endsWith("/") ? rawUrl.slice(0, -1) : rawUrl;
