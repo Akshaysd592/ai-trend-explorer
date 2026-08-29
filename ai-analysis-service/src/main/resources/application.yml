@@ -7,6 +7,8 @@ spring:
 
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    listener:
+      auto-startup: ${KAFKA_AUTO_STARTUP:false}
     consumer:
       group-id: ai-analysis-group
       auto-offset-reset: earliest

@@ -1,7 +1,7 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # AI Trend Explorer — Render Infrastructure as Code (Blueprint)
 # 100% Free Plan Compatible (Uses type: web & Free PostgreSQL + Redis)
-# Security: Zero Hardcoded Secrets (Env Var Groups)
+# Security: Zero Hardcoded Secrets (Env Var Groups & Next.js Rewrites Proxy)
 # Cost: $0.00 / month
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -147,8 +147,5 @@ services:
     plan: free
     region: oregon
     envVars:
-      - key: NEXT_PUBLIC_API_URL
-        fromService:
-          type: web
-          name: api-gateway
-          property: host
+      - key: API_GATEWAY_URL
+        value: http://api-gateway:10000
