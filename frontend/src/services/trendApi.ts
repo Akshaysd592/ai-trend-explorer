@@ -1,7 +1,29 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { GetTrendsParams, PagedResult, Trend } from '@/types/trend';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+function getApiBaseUrl(): string {
+  const url = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080').trim();
+
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    try {
+      const parsed = new URL(url);
+      if (!parsed.hostname.includes('.') && parsed.hostname !== 'localhost') {
+        return `https://${parsed.hostname}.onrender.com`;
+      }
+    } catch {
+      // ignore
+    }
+    return url.replace(/\/$/, '');
+  }
+
+  if (!url.includes('.') && url !== 'localhost') {
+    return `https://${url}.onrender.com`;
+  }
+
+  return `https://${url.replace(/\/$/, '')}`;
+}
+
+const API_BASE_URL = getApiBaseUrl();
 
 export async function fetchTrends(params: GetTrendsParams): Promise<PagedResult<Trend>> {
   const queryParams = new URLSearchParams();
@@ -28,60 +50,72 @@ export async function fetchTrends(params: GetTrendsParams): Promise<PagedResult<
     queryParams.append('sortDir', params.sortDir);
   }
 
-  const response = await fetch(`${API_BASE_URL}/api/v1/trends?${queryParams.toString()}`);
-  if (!response.ok) {
-    throw new Error(`Failed to fetch trends: ${response.statusText}`);
-  }
+  const queryString = queryParams.toString();
+  const url = `${API_BASE_URL}/api/v1/trends${queryString ? `?${queryString}` : ''}`;
 
-  return response.json();
-}
-
-export async function fetchTrendById(id: number | string): Promise<Trend> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/trends/${id}`);
-  if (!response.ok) {
-    if (response.status === 404) {
-      throw new Error('Trend not found');
-    }
-    throw new Error(`Failed to fetch trend details: ${response.statusText}`);
-  }
-  return response.json();
-}
-
-export async function triggerAiAnalysis(id: number | string): Promise<any> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/analysis/trend/${id}`, {
-    method: 'POST',
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
   });
+
   if (!response.ok) {
-    throw new Error(`AI Analysis request failed: ${response.statusText}`);
+    throw new Error('Failed to fetch trends');
   }
+
   return response.json();
 }
+
+export async function fetchTrendById(id: string | number): Promise<Trend> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/trends/${id}`, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch trend ${id}`);
+  }
+
+  return response.json();
+}
+
+export async function triggerAiAnalysis(trendId: string | number): Promise<Trend> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/trends/${trendId}/analyze`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to trigger AI analysis for trend ${trendId}`);
+  }
+
+  return response.json();
+}
+
+// ── TanStack Query Hooks ─────────────────────────────────────────────
 
 export function useTrends(params: GetTrendsParams) {
   return useQuery({
     queryKey: ['trends', params],
     queryFn: () => fetchTrends(params),
-    staleTime: 1000 * 60 * 5, // 5 minutes cache
+    staleTime: 1000 * 60 * 2, // 2 minutes
   });
 }
 
-export function useTrend(id: number | string) {
+export function useTrend(id: string | number) {
   return useQuery({
     queryKey: ['trend', id],
     queryFn: () => fetchTrendById(id),
     enabled: !!id,
-    staleTime: 1000 * 60 * 5,
   });
 }
 
 export function useAnalyzeTrend() {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: (id: number | string) => triggerAiAnalysis(id),
-    onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: ['trend', id] });
+    mutationFn: (trendId: string | number) => triggerAiAnalysis(trendId),
+    onSuccess: (updatedTrend) => {
       queryClient.invalidateQueries({ queryKey: ['trends'] });
+      queryClient.setQueryData(['trend', updatedTrend.id], updatedTrend);
     },
   });
 }

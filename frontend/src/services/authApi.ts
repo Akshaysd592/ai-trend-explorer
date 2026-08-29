@@ -1,7 +1,29 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { AuthResponse, LoginRequest, RegisterRequest, UserInfo } from '@/types/auth';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+function getApiBaseUrl(): string {
+  const url = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080').trim();
+
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    try {
+      const parsed = new URL(url);
+      if (!parsed.hostname.includes('.') && parsed.hostname !== 'localhost') {
+        return `https://${parsed.hostname}.onrender.com`;
+      }
+    } catch {
+      // ignore
+    }
+    return url.replace(/\/$/, '');
+  }
+
+  if (!url.includes('.') && url !== 'localhost') {
+    return `https://${url}.onrender.com`;
+  }
+
+  return `https://${url.replace(/\/$/, '')}`;
+}
+
+const API_BASE_URL = getApiBaseUrl();
 
 // ── Raw API functions ────────────────────────────────────────────────
 
