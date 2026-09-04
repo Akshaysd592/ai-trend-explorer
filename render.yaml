@@ -40,7 +40,7 @@ services:
       - key: SPRING_DATASOURCE_URL
         fromDatabase:
           name: ai-trend-db
-          property: connectionString
+          property: jdbcConnectionString
       - key: SPRING_DATASOURCE_USERNAME
         fromDatabase:
           name: ai-trend-db
@@ -67,7 +67,7 @@ services:
       - key: SPRING_DATASOURCE_URL
         fromDatabase:
           name: ai-trend-db
-          property: connectionString
+          property: jdbcConnectionString
       - key: SPRING_DATASOURCE_USERNAME
         fromDatabase:
           name: ai-trend-db
