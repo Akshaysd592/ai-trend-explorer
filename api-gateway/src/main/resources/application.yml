@@ -9,9 +9,10 @@ spring:
       globalcors:
         cors-configurations:
           '[/**]':
-            allowedOrigins:
-              - "http://localhost:3000"
-              - "http://127.0.0.1:3000"
+            # Set ALLOWED_ORIGINS in Render Dashboard after deploy
+            # e.g. https://ai-trend-explorer-frontend.onrender.com
+            allowedOriginPatterns:
+              - "${ALLOWED_ORIGINS:http://localhost:3000,http://127.0.0.1:3000}"
             allowedMethods:
               - GET
               - POST

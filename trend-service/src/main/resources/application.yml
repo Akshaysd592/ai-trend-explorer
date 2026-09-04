@@ -26,8 +26,9 @@ spring:
 
   data:
     redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
+      # Render provides REDIS_URL as a full rediss:// connection string
+      # Falls back to host/port for local Docker Compose
+      url: ${REDIS_URL:redis://${REDIS_HOST:localhost}:${REDIS_PORT:6379}}
 
   cache:
     type: redis
@@ -36,6 +37,15 @@ spring:
 
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    # ── Aiven Kafka — SASL_SSL + SCRAM-SHA-256 (free, no credit card) ────────
+    # Set KAFKA_* vars in Render Dashboard for production.
+    # Locally, KAFKA_SECURITY_PROTOCOL defaults to PLAINTEXT — SASL ignored.
+    properties:
+      security.protocol: ${KAFKA_SECURITY_PROTOCOL:PLAINTEXT}
+      sasl.mechanism: ${KAFKA_SASL_MECHANISM:SCRAM-SHA-256}
+      sasl.jaas.config: "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"${KAFKA_SASL_USERNAME:}\" password=\"${KAFKA_SASL_PASSWORD:}\";"
+      # No CA cert file needed — uses JVM default trust store
+      ssl.endpoint.identification.algorithm: ""
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
