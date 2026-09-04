@@ -37,10 +37,18 @@ services:
     dockerContext: ./auth-service
     healthCheckPath: /actuator/health
     envVars:
-      - key: SPRING_DATASOURCE_URL
+      - key: SPRING_DATASOURCE_HOST
         fromDatabase:
           name: ai-trend-db
-          property: jdbcConnectionString
+          property: host
+      - key: SPRING_DATASOURCE_PORT
+        fromDatabase:
+          name: ai-trend-db
+          property: port
+      - key: SPRING_DATASOURCE_DB
+        fromDatabase:
+          name: ai-trend-db
+          property: database
       - key: SPRING_DATASOURCE_USERNAME
         fromDatabase:
           name: ai-trend-db
@@ -64,10 +72,18 @@ services:
     dockerContext: ./trend-service
     healthCheckPath: /actuator/health
     envVars:
-      - key: SPRING_DATASOURCE_URL
+      - key: SPRING_DATASOURCE_HOST
         fromDatabase:
           name: ai-trend-db
-          property: jdbcConnectionString
+          property: host
+      - key: SPRING_DATASOURCE_PORT
+        fromDatabase:
+          name: ai-trend-db
+          property: port
+      - key: SPRING_DATASOURCE_DB
+        fromDatabase:
+          name: ai-trend-db
+          property: database
       - key: SPRING_DATASOURCE_USERNAME
         fromDatabase:
           name: ai-trend-db
