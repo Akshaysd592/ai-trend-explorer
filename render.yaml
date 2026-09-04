@@ -162,21 +162,12 @@ services:
     dockerContext: ./api-gateway
     healthCheckPath: /actuator/health
     envVars:
-      - key: AUTH_SERVICE_HOST
-        fromService:
-          type: web
-          name: auth-service
-          property: host
-      - key: TREND_SERVICE_HOST
-        fromService:
-          type: web
-          name: trend-service
-          property: host
-      - key: AI_ANALYSIS_SERVICE_HOST
-        fromService:
-          type: web
-          name: ai-analysis-service
-          property: host
+      - key: AUTH_SERVICE_URL
+        sync: false               # Set to https://auth-service-s01r.onrender.com
+      - key: TREND_SERVICE_URL
+        sync: false               # Set to https://trend-service-s01r.onrender.com
+      - key: AI_ANALYSIS_SERVICE_URL
+        sync: false               # Set to https://ai-analysis-service-s01r.onrender.com
       - key: ALLOWED_ORIGINS
         sync: false               # Set to your frontend URL e.g. https://ai-trend-explorer-frontend.onrender.com
       - key: SERVER_PORT
@@ -192,10 +183,7 @@ services:
     dockerContext: ./frontend
     envVars:
       - key: NEXT_PUBLIC_API_URL
-        fromService:
-          type: web
-          name: api-gateway
-          property: host
+        sync: false               # Set to https://api-gateway-s01r.onrender.com in Render Dashboard
       - key: PORT
         value: "3000"
       - key: HOSTNAME
