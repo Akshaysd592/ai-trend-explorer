@@ -11,17 +11,10 @@
 # ============================================================
 
 databases:
-  # ── Auth Service PostgreSQL ──────────────────────────────
-  - name: auth-db
-    databaseName: auth_db
-    user: auth_user
-    plan: free
-    region: oregon
-
-  # ── Trend Service PostgreSQL ─────────────────────────────
-  - name: trend-db
-    databaseName: trend_db
-    user: trend_user
+  # ── Shared PostgreSQL (Render Free Tier allows 1 DB per account) ──
+  - name: ai-trend-db
+    databaseName: ai_trend_db
+    user: ai_trend_user
     plan: free
     region: oregon
 
@@ -46,15 +39,15 @@ services:
     envVars:
       - key: SPRING_DATASOURCE_URL
         fromDatabase:
-          name: auth-db
+          name: ai-trend-db
           property: connectionString
       - key: SPRING_DATASOURCE_USERNAME
         fromDatabase:
-          name: auth-db
+          name: ai-trend-db
           property: user
       - key: SPRING_DATASOURCE_PASSWORD
         fromDatabase:
-          name: auth-db
+          name: ai-trend-db
           property: password
       - key: JWT_SECRET
         sync: false               # Set in Render Dashboard
@@ -73,15 +66,15 @@ services:
     envVars:
       - key: SPRING_DATASOURCE_URL
         fromDatabase:
-          name: trend-db
+          name: ai-trend-db
           property: connectionString
       - key: SPRING_DATASOURCE_USERNAME
         fromDatabase:
-          name: trend-db
+          name: ai-trend-db
           property: user
       - key: SPRING_DATASOURCE_PASSWORD
         fromDatabase:
-          name: trend-db
+          name: ai-trend-db
           property: password
       - key: REDIS_URL
         fromService:
