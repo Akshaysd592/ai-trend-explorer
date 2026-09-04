@@ -47,8 +47,8 @@ spring:
       security.protocol: ${KAFKA_SECURITY_PROTOCOL:PLAINTEXT}
       sasl.mechanism: ${KAFKA_SASL_MECHANISM:SCRAM-SHA-256}
       sasl.jaas.config: "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"${KAFKA_SASL_USERNAME:}\" password=\"${KAFKA_SASL_PASSWORD:}\";"
-      # No CA cert file needed — uses JVM default trust store
       ssl.endpoint.identification.algorithm: ""
+      ssl.engine.factory.class: com.aitrend.trend.infrastructure.config.InsecureSslEngineFactory
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer

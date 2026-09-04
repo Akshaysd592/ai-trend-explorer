@@ -18,6 +18,7 @@ spring:
       sasl.mechanism: ${KAFKA_SASL_MECHANISM:SCRAM-SHA-256}
       sasl.jaas.config: "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"${KAFKA_SASL_USERNAME:}\" password=\"${KAFKA_SASL_PASSWORD:}\";"
       ssl.endpoint.identification.algorithm: ""
+      ssl.engine.factory.class: com.aitrend.analysis.infrastructure.config.InsecureSslEngineFactory
     consumer:
       group-id: ai-analysis-group
       auto-offset-reset: earliest
