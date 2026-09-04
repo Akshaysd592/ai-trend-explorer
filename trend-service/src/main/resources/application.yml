@@ -26,9 +26,8 @@ spring:
 
   data:
     redis:
-      # Render provides REDIS_URL as a full connection string (rediss://...)
-      # Fall back to separate host/port for local Docker Compose
-      url: ${REDIS_URL:redis://${REDIS_HOST:localhost}:${REDIS_PORT:6379}}
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
 
   cache:
     type: redis
@@ -37,14 +36,6 @@ spring:
 
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
-    # ── Confluent Cloud SASL/PLAIN (SASL_SSL) ───────────────────────────────
-    # Set in Render Dashboard for production (Confluent Cloud).
-    # For local Docker Compose, KAFKA_SECURITY_PROTOCOL defaults to PLAINTEXT
-    # and KAFKA_SASL_USERNAME/PASSWORD are empty — Kafka ignores SASL config.
-    properties:
-      security.protocol: ${KAFKA_SECURITY_PROTOCOL:PLAINTEXT}
-      sasl.mechanism: ${KAFKA_SASL_MECHANISM:PLAIN}
-      sasl.jaas.config: "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"${KAFKA_SASL_USERNAME:}\" password=\"${KAFKA_SASL_PASSWORD:}\";"
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
