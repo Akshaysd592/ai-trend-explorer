@@ -1,0 +1,210 @@
+# ============================================================
+# render.yaml — AI Trend Explorer
+# Render Blueprint (Infrastructure-as-Code)
+#
+# ⚠️  SECURITY: This file is safe to commit to a PUBLIC repo.
+#     All variables marked sync: false MUST be set manually
+#     in the Render Dashboard → Environment after first deploy.
+#     Never put actual secret values in this file.
+#
+# Render Docs: https://render.com/docs/blueprint-spec
+# ============================================================
+
+databases:
+  # ── Auth Service PostgreSQL ──────────────────────────────
+  - name: auth-db
+    databaseName: auth_db
+    user: auth_user
+    plan: free
+    region: oregon
+
+  # ── Trend Service PostgreSQL ─────────────────────────────
+  - name: trend-db
+    databaseName: trend_db
+    user: trend_user
+    plan: free
+    region: oregon
+
+services:
+  # ── Redis ────────────────────────────────────────────────
+  - type: redis
+    name: ai-trend-redis
+    plan: free
+    region: oregon
+    maxmemoryPolicy: allkeys-lru
+    ipAllowList: []               # Internal access only
+
+  # ── Auth Service ─────────────────────────────────────────
+  - type: web
+    name: auth-service
+    region: oregon
+    plan: free
+    runtime: docker
+    dockerfilePath: ./auth-service/Dockerfile
+    dockerContext: ./auth-service
+    healthCheckPath: /actuator/health
+    # Spring Boot takes ~60s to start on free tier — give it breathing room
+    healthCheckGracePeriodSeconds: 120
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        fromDatabase:
+          name: auth-db
+          property: connectionString
+      - key: SPRING_DATASOURCE_USERNAME
+        fromDatabase:
+          name: auth-db
+          property: user
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromDatabase:
+          name: auth-db
+          property: password
+      - key: JWT_SECRET
+        sync: false               # Set in Render Dashboard
+      - key: SERVER_PORT
+        value: "8082"
+
+  # ── Trend Service ─────────────────────────────────────────
+  - type: web
+    name: trend-service
+    region: oregon
+    plan: free
+    runtime: docker
+    dockerfilePath: ./trend-service/Dockerfile
+    dockerContext: ./trend-service
+    healthCheckPath: /actuator/health
+    healthCheckGracePeriodSeconds: 120
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        fromDatabase:
+          name: trend-db
+          property: connectionString
+      - key: SPRING_DATASOURCE_USERNAME
+        fromDatabase:
+          name: trend-db
+          property: user
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromDatabase:
+          name: trend-db
+          property: password
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: ai-trend-redis
+          property: connectionString
+      - key: JWT_SECRET
+        sync: false               # Set in Render Dashboard (same value as auth-service)
+      - key: GEMINI_API_KEY
+        sync: false               # Set in Render Dashboard
+      - key: GEMINI_MODEL
+        value: "gemini-2.0-flash-lite"
+      - key: GITHUB_TOKEN
+        sync: false               # Set in Render Dashboard
+      # ── Confluent Cloud Kafka (SASL/PLAIN) ────────────────
+      - key: KAFKA_BOOTSTRAP_SERVERS
+        sync: false               # e.g. pkc-xxxxx.us-east-2.aws.confluent.cloud:9092
+      - key: KAFKA_SASL_USERNAME
+        sync: false               # Confluent API Key
+      - key: KAFKA_SASL_PASSWORD
+        sync: false               # Confluent API Secret
+      - key: KAFKA_SECURITY_PROTOCOL
+        value: "SASL_SSL"
+      - key: KAFKA_SASL_MECHANISM
+        value: "PLAIN"
+      - key: SERVER_PORT
+        value: "8081"
+
+  # ── AI Analysis Service ───────────────────────────────────
+  - type: web
+    name: ai-analysis-service
+    region: oregon
+    plan: free
+    runtime: docker
+    dockerfilePath: ./ai-analysis-service/Dockerfile
+    dockerContext: ./ai-analysis-service
+    healthCheckPath: /actuator/health
+    healthCheckGracePeriodSeconds: 120
+    envVars:
+      - key: TREND_SERVICE_URL
+        fromService:
+          type: web
+          name: trend-service
+          property: host
+          envVarKey: TREND_SERVICE_URL
+      - key: GEMINI_API_KEY
+        sync: false               # Set in Render Dashboard
+      - key: GEMINI_MODEL
+        value: "gemini-2.0-flash-lite"
+      # ── Confluent Cloud Kafka (SASL/PLAIN) ────────────────
+      - key: KAFKA_BOOTSTRAP_SERVERS
+        sync: false               # Same as trend-service
+      - key: KAFKA_SASL_USERNAME
+        sync: false               # Same Confluent API Key
+      - key: KAFKA_SASL_PASSWORD
+        sync: false               # Same Confluent API Secret
+      - key: KAFKA_SECURITY_PROTOCOL
+        value: "SASL_SSL"
+      - key: KAFKA_SASL_MECHANISM
+        value: "PLAIN"
+      - key: SERVER_PORT
+        value: "8083"
+
+  # ── API Gateway ───────────────────────────────────────────
+  - type: web
+    name: api-gateway
+    region: oregon
+    plan: free
+    runtime: docker
+    dockerfilePath: ./api-gateway/Dockerfile
+    dockerContext: ./api-gateway
+    healthCheckPath: /actuator/health
+    healthCheckGracePeriodSeconds: 120
+    envVars:
+      - key: AUTH_SERVICE_URL
+        fromService:
+          type: web
+          name: auth-service
+          property: host
+          envVarKey: AUTH_SERVICE_URL
+      - key: TREND_SERVICE_URL
+        fromService:
+          type: web
+          name: trend-service
+          property: host
+          envVarKey: TREND_SERVICE_URL
+      - key: AI_ANALYSIS_SERVICE_URL
+        fromService:
+          type: web
+          name: ai-analysis-service
+          property: host
+          envVarKey: AI_ANALYSIS_SERVICE_URL
+      - key: ALLOWED_ORIGINS
+        sync: false               # Set to your frontend URL e.g. https://ai-trend-explorer-frontend.onrender.com
+      - key: SERVER_PORT
+        value: "8080"
+
+  # ── Frontend (Next.js) ────────────────────────────────────
+  - type: web
+    name: ai-trend-explorer-frontend
+    region: oregon
+    plan: free
+    runtime: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    dockerBuildArgs:
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          type: web
+          name: api-gateway
+          property: host
+          envVarKey: NEXT_PUBLIC_API_URL
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          type: web
+          name: api-gateway
+          property: host
+          envVarKey: NEXT_PUBLIC_API_URL
+      - key: PORT
+        value: "3000"
+      - key: HOSTNAME
+        value: "0.0.0.0"
