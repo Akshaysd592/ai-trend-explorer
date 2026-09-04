@@ -24,31 +24,31 @@ spring:
             allowCredentials: true
       routes:
         - id: auth-service
-          uri: ${AUTH_SERVICE_URL:http://localhost:8082}
+          uri: ${AUTH_SERVICE_URL:http://${AUTH_SERVICE_HOST:localhost}:8082}
           predicates:
             - Path=/api/v1/auth/**
         - id: auth-docs
-          uri: ${AUTH_SERVICE_URL:http://localhost:8082}
+          uri: ${AUTH_SERVICE_URL:http://${AUTH_SERVICE_HOST:localhost}:8082}
           predicates:
             - Path=/v3/api-docs/auth/**
           filters:
             - RewritePath=/v3/api-docs/auth(?<segment>/?.*), /v3/api-docs$\{segment}
         - id: trend-service
-          uri: ${TREND_SERVICE_URL:http://localhost:8081}
+          uri: ${TREND_SERVICE_URL:http://${TREND_SERVICE_HOST:localhost}:8081}
           predicates:
             - Path=/api/v1/trends/**
         - id: trend-docs
-          uri: ${TREND_SERVICE_URL:http://localhost:8081}
+          uri: ${TREND_SERVICE_URL:http://${TREND_SERVICE_HOST:localhost}:8081}
           predicates:
             - Path=/v3/api-docs/trends/**
           filters:
             - RewritePath=/v3/api-docs/trends(?<segment>/?.*), /v3/api-docs$\{segment}
         - id: ai-analysis-service
-          uri: ${AI_ANALYSIS_SERVICE_URL:http://localhost:8083}
+          uri: ${AI_ANALYSIS_SERVICE_URL:http://${AI_ANALYSIS_SERVICE_HOST:localhost}:8083}
           predicates:
             - Path=/api/v1/analysis/**
         - id: ai-analysis-docs
-          uri: ${AI_ANALYSIS_SERVICE_URL:http://localhost:8083}
+          uri: ${AI_ANALYSIS_SERVICE_URL:http://${AI_ANALYSIS_SERVICE_HOST:localhost}:8083}
           predicates:
             - Path=/v3/api-docs/analysis/**
           filters:

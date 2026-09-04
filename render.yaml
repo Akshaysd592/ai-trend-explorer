@@ -162,17 +162,17 @@ services:
     dockerContext: ./api-gateway
     healthCheckPath: /actuator/health
     envVars:
-      - key: AUTH_SERVICE_URL
+      - key: AUTH_SERVICE_HOST
         fromService:
           type: web
           name: auth-service
           property: host
-      - key: TREND_SERVICE_URL
+      - key: TREND_SERVICE_HOST
         fromService:
           type: web
           name: trend-service
           property: host
-      - key: AI_ANALYSIS_SERVICE_URL
+      - key: AI_ANALYSIS_SERVICE_HOST
         fromService:
           type: web
           name: ai-analysis-service
