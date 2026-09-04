@@ -125,7 +125,6 @@ services:
           type: web
           name: trend-service
           property: host
-          envVarKey: TREND_SERVICE_URL
       - key: GEMINI_API_KEY
         sync: false               # Set in Render Dashboard
       - key: GEMINI_MODEL
@@ -159,19 +158,16 @@ services:
           type: web
           name: auth-service
           property: host
-          envVarKey: AUTH_SERVICE_URL
       - key: TREND_SERVICE_URL
         fromService:
           type: web
           name: trend-service
           property: host
-          envVarKey: TREND_SERVICE_URL
       - key: AI_ANALYSIS_SERVICE_URL
         fromService:
           type: web
           name: ai-analysis-service
           property: host
-          envVarKey: AI_ANALYSIS_SERVICE_URL
       - key: ALLOWED_ORIGINS
         sync: false               # Set to your frontend URL e.g. https://ai-trend-explorer-frontend.onrender.com
       - key: SERVER_PORT
@@ -191,7 +187,6 @@ services:
           type: web
           name: api-gateway
           property: host
-          envVarKey: NEXT_PUBLIC_API_URL
       - key: PORT
         value: "3000"
       - key: HOSTNAME
