@@ -7,6 +7,9 @@ spring:
 
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    admin:
+      auto-create: false
+      fail-fast: false
     # ── Aiven Kafka — SASL_SSL + SCRAM-SHA-256 (free, no credit card) ────────
     # Set KAFKA_* vars in Render Dashboard for production.
     # Locally, KAFKA_SECURITY_PROTOCOL defaults to PLAINTEXT — SASL ignored.
