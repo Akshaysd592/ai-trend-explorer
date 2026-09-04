@@ -43,7 +43,6 @@ services:
     dockerfilePath: ./auth-service/Dockerfile
     dockerContext: ./auth-service
     healthCheckPath: /actuator/health
-    healthCheckGracePeriodSeconds: 120
     envVars:
       - key: SPRING_DATASOURCE_URL
         fromDatabase:
@@ -71,7 +70,6 @@ services:
     dockerfilePath: ./trend-service/Dockerfile
     dockerContext: ./trend-service
     healthCheckPath: /actuator/health
-    healthCheckGracePeriodSeconds: 120
     envVars:
       - key: SPRING_DATASOURCE_URL
         fromDatabase:
@@ -121,7 +119,6 @@ services:
     dockerfilePath: ./ai-analysis-service/Dockerfile
     dockerContext: ./ai-analysis-service
     healthCheckPath: /actuator/health
-    healthCheckGracePeriodSeconds: 120
     envVars:
       - key: TREND_SERVICE_URL
         fromService:
@@ -156,7 +153,6 @@ services:
     dockerfilePath: ./api-gateway/Dockerfile
     dockerContext: ./api-gateway
     healthCheckPath: /actuator/health
-    healthCheckGracePeriodSeconds: 120
     envVars:
       - key: AUTH_SERVICE_URL
         fromService:
@@ -189,13 +185,6 @@ services:
     runtime: docker
     dockerfilePath: ./frontend/Dockerfile
     dockerContext: ./frontend
-    dockerBuildArgs:
-      - key: NEXT_PUBLIC_API_URL
-        fromService:
-          type: web
-          name: api-gateway
-          property: host
-          envVarKey: NEXT_PUBLIC_API_URL
     envVars:
       - key: NEXT_PUBLIC_API_URL
         fromService:
