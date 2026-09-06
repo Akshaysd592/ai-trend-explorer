@@ -19,6 +19,10 @@ public class GitHubApiClientAdapter implements FetchGitHubTrendsPort {
     private static final Logger log = LoggerFactory.getLogger(GitHubApiClientAdapter.class);
     private final RestClient restClient;
 
+    public GitHubApiClientAdapter() {
+        this(null);
+    }
+
     public GitHubApiClientAdapter(@Value("${github.token:${GITHUB_TOKEN:}}") String githubToken) {
         RestClient.Builder builder = RestClient.builder()
                 .baseUrl("https://api.github.com")
