@@ -1,25 +1,14 @@
-# 🚀 AI Trend Explorer
+# 🚀 AI Trend Explorer — [Live Microservices Dashboard](https://ai-trend-explorer-frontend-s01r.onrender.com/)
 
-[![Java 21](https://img.shields.io/badge/Java-21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/projects/jdk/21/)
-[![Spring Boot 3.3.2](https://img.shields.io/badge/Spring%20Boot-3.3.2-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
-[![Next.js 15](https://img.shields.io/badge/Next.js-15.0.3-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
-[![Apache Kafka](https://img.shields.io/badge/Apache%20Kafka-3.7-231F20?style=for-the-badge&logo=apachekafka&logoColor=white)](https://kafka.apache.org/)
-[![Redis 7](https://img.shields.io/badge/Redis-7.x-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
-[![PostgreSQL 16](https://img.shields.io/badge/PostgreSQL-16-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-[![Google Gemini](https://img.shields.io/badge/Gemini%20AI-2.0%20Flash%20Lite-8E75C2?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
-[![Aiven Kafka](https://img.shields.io/badge/Aiven-Kafka%20Free-FF5252?style=for-the-badge&logo=apachekafka&logoColor=white)](https://aiven.io/kafka)
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://ai-trend-explorer-frontend-s01r.onrender.com/)
-[![Docker Compose](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
-[![Author](https://img.shields.io/badge/Author-Akshay-blue?style=for-the-badge&logo=github)](https://github.com/Akshaysd592)
-
-> **An enterprise-grade, event-driven microservices platform designed to discover, aggregate, score, and AI-enrich trending open-source AI repositories and models in real time.**
->
-> 🌐 **Live Production Link**: [https://ai-trend-explorer-frontend-s01r.onrender.com](https://ai-trend-explorer-frontend-s01r.onrender.com)
+## 🌐 Live Links
+- **Frontend Dashboard**: [https://ai-trend-explorer-frontend-s01r.onrender.com](https://ai-trend-explorer-frontend-s01r.onrender.com)
+- **API Gateway**: [https://api-gateway-s01r.onrender.com](https://api-gateway-s01r.onrender.com)
 
 ---
 
 ## 📑 Table of Contents
+
+- [Live Links](#-live-links)
 
 - [Overview](#-overview)
 - [System Architecture](#-system-architecture)
