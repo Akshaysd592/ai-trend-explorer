@@ -7,6 +7,18 @@ spring:
 
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    admin:
+      auto-create: false
+      fail-fast: false
+    # ── Aiven Kafka — SASL_SSL + SCRAM-SHA-256 (free, no credit card) ────────
+    # Set KAFKA_* vars in Render Dashboard for production.
+    # Locally, KAFKA_SECURITY_PROTOCOL defaults to PLAINTEXT — SASL ignored.
+    properties:
+      security.protocol: ${KAFKA_SECURITY_PROTOCOL:PLAINTEXT}
+      sasl.mechanism: ${KAFKA_SASL_MECHANISM:SCRAM-SHA-256}
+      sasl.jaas.config: "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"${KAFKA_SASL_USERNAME:}\" password=\"${KAFKA_SASL_PASSWORD:}\";"
+      ssl.endpoint.identification.algorithm: ""
+      ssl.engine.factory.class: com.aitrend.analysis.infrastructure.config.InsecureSslEngineFactory
     consumer:
       group-id: ai-analysis-group
       auto-offset-reset: earliest

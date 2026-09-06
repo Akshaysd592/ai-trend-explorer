@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: ${SERVER_PORT:${PORT:8080}}
 
 spring:
   application:
@@ -9,9 +9,9 @@ spring:
       globalcors:
         cors-configurations:
           '[/**]':
-            allowedOrigins:
-              - "http://localhost:3000"
-              - "http://127.0.0.1:3000"
+            allowedOriginPatterns:
+              - "*"
+              - "${ALLOWED_ORIGINS:*}"
             allowedMethods:
               - GET
               - POST
