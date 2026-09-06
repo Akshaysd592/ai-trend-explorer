@@ -6,6 +6,7 @@ import com.aitrend.trend.domain.model.Trend;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
@@ -20,10 +21,17 @@ public class GitHubApiClientAdapter implements FetchGitHubTrendsPort {
     private final RestClient restClient;
 
     public GitHubApiClientAdapter() {
-        this(null);
+        this(null, null);
     }
 
-    public GitHubApiClientAdapter(@Value("${github.token:${GITHUB_TOKEN:}}") String githubToken) {
+    public GitHubApiClientAdapter(@Value("${GITHUB_TOKEN:${github.token:}}") String githubToken, Environment environment) {
+        if ((githubToken == null || githubToken.isBlank()) && environment != null) {
+            githubToken = environment.getProperty("GITHUB_TOKEN");
+            if (githubToken == null || githubToken.isBlank()) {
+                githubToken = environment.getProperty("github.token");
+            }
+        }
+
         RestClient.Builder builder = RestClient.builder()
                 .baseUrl("https://api.github.com")
                 .defaultHeader("User-Agent", "AI-Trend-Explorer-Service")
