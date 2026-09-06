@@ -8,12 +8,14 @@
 [![PostgreSQL 16](https://img.shields.io/badge/PostgreSQL-16-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Google Gemini](https://img.shields.io/badge/Gemini%20AI-2.0%20Flash%20Lite-8E75C2?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
 [![Aiven Kafka](https://img.shields.io/badge/Aiven-Kafka%20Free-FF5252?style=for-the-badge&logo=apachekafka&logoColor=white)](https://aiven.io/kafka)
-[![Deployed on Render](https://img.shields.io/badge/Deployed%20on-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://render.com/)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://ai-trend-explorer-frontend-s01r.onrender.com/)
 [![Docker Compose](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 [![Author](https://img.shields.io/badge/Author-Akshay-blue?style=for-the-badge&logo=github)](https://github.com/Akshaysd592)
 
 > **An enterprise-grade, event-driven microservices platform designed to discover, aggregate, score, and AI-enrich trending open-source AI repositories and models in real time.**
+>
+> 🌐 **Live Production Link**: [https://ai-trend-explorer-frontend-s01r.onrender.com](https://ai-trend-explorer-frontend-s01r.onrender.com)
 
 ---
 
@@ -256,8 +258,10 @@ docker compose ps
 All 9 containers should report `Up (healthy)`.
 
 ### 5. Access the Platform
-- **Frontend Web UI**: [http://localhost:3000](http://localhost:3000)
-- **API Gateway**: [http://localhost:8080](http://localhost:8080)
+- **Live Production Dashboard**: [https://ai-trend-explorer-frontend-s01r.onrender.com](https://ai-trend-explorer-frontend-s01r.onrender.com)
+- **Live Production API Gateway**: [https://api-gateway-s01r.onrender.com](https://api-gateway-s01r.onrender.com)
+- **Local Frontend Web UI**: [http://localhost:3000](http://localhost:3000)
+- **Local API Gateway**: [http://localhost:8080](http://localhost:8080)
 - **Trend Service OpenAPI Docs**: [http://localhost:8080/v3/api-docs/trends](http://localhost:8080/v3/api-docs/trends)
 
 ---
