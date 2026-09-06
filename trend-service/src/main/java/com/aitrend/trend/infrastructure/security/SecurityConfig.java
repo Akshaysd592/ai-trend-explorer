@@ -59,8 +59,8 @@ public class SecurityConfig {
                 // Inter-service update for AI metadata
                 .requestMatchers(HttpMethod.PATCH, "/api/v1/trends/**").permitAll()
 
-                // Write/admin operations — require valid JWT
-                .requestMatchers(HttpMethod.POST, "/api/v1/trends/ingest").authenticated()
+                // Public live trend ingestion trigger (Frontend Sync button & startup runner)
+                .requestMatchers(HttpMethod.POST, "/api/v1/trends/ingest").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/trends").authenticated()
 
                 // Everything else — require auth

@@ -57,6 +57,16 @@ export async function triggerAiAnalysis(id: number | string): Promise<any> {
   return response.json();
 }
 
+export async function triggerLiveIngestion(): Promise<{ totalIngested: number; githubCount: number; huggingFaceCount: number }> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/trends/ingest`, {
+    method: 'POST',
+  });
+  if (!response.ok) {
+    throw new Error(`Live trend ingestion failed: ${response.statusText}`);
+  }
+  return response.json();
+}
+
 export function useTrends(params: GetTrendsParams) {
   return useQuery({
     queryKey: ['trends', params],
@@ -81,6 +91,17 @@ export function useAnalyzeTrend() {
     mutationFn: (id: number | string) => triggerAiAnalysis(id),
     onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: ['trend', id] });
+      queryClient.invalidateQueries({ queryKey: ['trends'] });
+    },
+  });
+}
+
+export function useIngestTrends() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => triggerLiveIngestion(),
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['trends'] });
     },
   });

@@ -5,6 +5,7 @@ import com.aitrend.trend.domain.model.SourceType;
 import com.aitrend.trend.domain.model.Trend;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
@@ -18,12 +19,20 @@ public class GitHubApiClientAdapter implements FetchGitHubTrendsPort {
     private static final Logger log = LoggerFactory.getLogger(GitHubApiClientAdapter.class);
     private final RestClient restClient;
 
-    public GitHubApiClientAdapter() {
-        this.restClient = RestClient.builder()
+    public GitHubApiClientAdapter(@Value("${github.token:${GITHUB_TOKEN:}}") String githubToken) {
+        RestClient.Builder builder = RestClient.builder()
                 .baseUrl("https://api.github.com")
                 .defaultHeader("User-Agent", "AI-Trend-Explorer-Service")
-                .defaultHeader("Accept", "application/vnd.github.v3+json")
-                .build();
+                .defaultHeader("Accept", "application/vnd.github.v3+json");
+
+        if (githubToken != null && !githubToken.isBlank()) {
+            log.info("Configuring GitHubApiClientAdapter with authenticated Bearer token (5000 req/hr rate limit)...");
+            builder.defaultHeader("Authorization", "Bearer " + githubToken);
+        } else {
+            log.warn("No GITHUB_TOKEN provided. Operating under unauthenticated GitHub API rate limits (10 req/min).");
+        }
+
+        this.restClient = builder.build();
     }
 
     @Override
@@ -32,7 +41,7 @@ public class GitHubApiClientAdapter implements FetchGitHubTrendsPort {
         log.info("Fetching trending AI repositories from GitHub REST API...");
         try {
             Map<String, Object> response = restClient.get()
-                    .uri("/search/repositories?q=topic:ai+topic:llm&sort=stars&order=desc&per_page=20")
+                    .uri("/search/repositories?q=topic:ai+OR+topic:llm+OR+topic:machine-learning+OR+topic:deep-learning&sort=stars&order=desc&per_page=25")
                     .retrieve()
                     .body(Map.class);
 
@@ -79,4 +88,3 @@ public class GitHubApiClientAdapter implements FetchGitHubTrendsPort {
         }
     }
 }
-
