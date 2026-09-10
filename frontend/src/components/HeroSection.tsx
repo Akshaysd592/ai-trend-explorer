@@ -19,23 +19,23 @@ export const HeroSection: React.FC = () => {
           </h1>
 
           <p className="text-lg text-slate-400">
-            Aggregated trends across <span className="text-cyan-400 font-semibold">GitHub</span> and{' '}
-            <span className="text-yellow-400 font-semibold">Hugging Face</span> powered by Java 21 Hexagonal Architecture microservices.
+            Real-time aggregated trends across <span className="text-cyan-400 font-semibold">GitHub</span> repositories and{' '}
+            <span className="text-yellow-400 font-semibold">Hugging Face</span> AI models powered by intelligent analytics.
           </p>
 
           {/* Quick Metrics Badges */}
           <div className="pt-4 flex flex-wrap justify-center gap-6 text-sm text-slate-300">
             <div className="flex items-center space-x-2 bg-slate-800/60 px-4 py-2 rounded-xl border border-slate-700/60">
               <TrendingUp className="h-4 w-4 text-cyan-400" />
-              <span>Multi-Source Ingestion</span>
+              <span>Real-Time Ingestion</span>
             </div>
             <div className="flex items-center space-x-2 bg-slate-800/60 px-4 py-2 rounded-xl border border-slate-700/60">
               <Bot className="h-4 w-4 text-purple-400" />
-              <span>AI Insights & Categorization</span>
+              <span>AI Insights & Analytics</span>
             </div>
             <div className="flex items-center space-x-2 bg-slate-800/60 px-4 py-2 rounded-xl border border-slate-700/60">
               <Database className="h-4 w-4 text-emerald-400" />
-              <span>Liquibase & PostgreSQL</span>
+              <span>Unified Repository Index</span>
             </div>
           </div>
         </div>

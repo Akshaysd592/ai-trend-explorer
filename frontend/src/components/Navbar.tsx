@@ -48,7 +48,7 @@ export const Navbar: React.FC = () => {
               AI Trend Explorer
             </span>
             <span className="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800/50">
-              v1.0 Microservices
+              v1.0 Platform
             </span>
           </div>
         </Link>
@@ -82,7 +82,7 @@ export const Navbar: React.FC = () => {
           <div className="hidden lg:flex items-center space-x-2 text-xs text-slate-400">
             <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-md bg-slate-800/80 border border-slate-700">
               <Cpu className="h-3.5 w-3.5 text-emerald-400 mr-1" />
-              <span>Gateway :8080</span>
+              <span>System Online</span>
             </span>
           </div>
 

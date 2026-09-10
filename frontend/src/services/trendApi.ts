@@ -67,11 +67,12 @@ export async function triggerLiveIngestion(): Promise<{ totalIngested: number; g
   return response.json();
 }
 
-export function useTrends(params: GetTrendsParams) {
+export function useTrends(params: GetTrendsParams, options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ['trends', params],
     queryFn: () => fetchTrends(params),
     staleTime: 1000 * 60 * 5, // 5 minutes cache
+    ...options,
   });
 }
 
