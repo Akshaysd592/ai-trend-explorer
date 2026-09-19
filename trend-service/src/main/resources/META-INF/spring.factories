@@ -1,1 +1,0 @@
-org.springframework.boot.env.EnvironmentPostProcessor=com.aitrend.trend.infrastructure.config.JdbcUrlEnvironmentPostProcessor
