@@ -23,7 +23,7 @@ export const Navbar: React.FC = () => {
         setSyncStatusMessage(`Synced ${data.totalIngested} items!`);
         setTimeout(() => setSyncStatusMessage(null), 4000);
       },
-      onError: (err: any) => {
+      onError: () => {
         setSyncStatusMessage('Sync failed');
         setTimeout(() => setSyncStatusMessage(null), 4000);
       },
@@ -55,28 +55,30 @@ export const Navbar: React.FC = () => {
 
         {/* Right side */}
         <div className="flex items-center space-x-3">
-          {/* Sync Live Trends Button */}
-          <button
-            onClick={handleSyncTrends}
-            disabled={isSyncing}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${
-              isSyncing
-                ? 'bg-cyan-950/70 border-cyan-700/50 text-cyan-300 cursor-wait'
-                : 'bg-gradient-to-r from-slate-800 to-slate-800/90 hover:from-cyan-950/40 hover:to-blue-950/40 border-cyan-800/40 hover:border-cyan-500/50 text-cyan-300 hover:text-cyan-200'
-            }`}
-            title="Fetch latest AI repositories & models from GitHub and HuggingFace"
-          >
-            {isSyncing ? (
-              <RefreshCw className="h-3.5 w-3.5 animate-spin text-cyan-400" />
-            ) : syncStatusMessage ? (
-              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
-            ) : (
-              <RefreshCw className="h-3.5 w-3.5 text-cyan-400" />
-            )}
-            <span className="hidden sm:inline">
-              {isSyncing ? 'Syncing...' : syncStatusMessage || 'Sync Live Trends'}
-            </span>
-          </button>
+          {/* Sync Live Trends Button (Only visible for authenticated users) */}
+          {isAuthenticated && (
+            <button
+              onClick={handleSyncTrends}
+              disabled={isSyncing}
+              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${
+                isSyncing
+                  ? 'bg-cyan-950/70 border-cyan-700/50 text-cyan-300 cursor-wait'
+                  : 'bg-gradient-to-r from-slate-800 to-slate-800/90 hover:from-cyan-950/40 hover:to-blue-950/40 border-cyan-800/40 hover:border-cyan-500/50 text-cyan-300 hover:text-cyan-200'
+              }`}
+              title="Fetch latest AI repositories & models from GitHub and HuggingFace"
+            >
+              {isSyncing ? (
+                <RefreshCw className="h-3.5 w-3.5 animate-spin text-cyan-400" />
+              ) : syncStatusMessage ? (
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+              ) : (
+                <RefreshCw className="h-3.5 w-3.5 text-cyan-400" />
+              )}
+              <span className="hidden sm:inline">
+                {isSyncing ? 'Syncing...' : syncStatusMessage || 'Sync Live Trends'}
+              </span>
+            </button>
+          )}
 
           {/* Status Indicators */}
           <div className="hidden lg:flex items-center space-x-2 text-xs text-slate-400">
