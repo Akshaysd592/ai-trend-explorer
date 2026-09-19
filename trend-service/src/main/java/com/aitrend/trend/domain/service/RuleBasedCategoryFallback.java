@@ -1,5 +1,6 @@
 package com.aitrend.trend.domain.service;
 
+import com.aitrend.trend.application.port.out.AiEnrichmentPort;
 import com.aitrend.trend.domain.model.AiMetadata;
 import com.aitrend.trend.domain.model.Trend;
 import org.springframework.stereotype.Component;
@@ -7,7 +8,12 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class RuleBasedCategoryFallback {
+public class RuleBasedCategoryFallback implements AiEnrichmentPort {
+
+    @Override
+    public AiMetadata enrich(Trend trend) {
+        return generateFallbackMetadata(trend);
+    }
 
     public AiMetadata generateFallbackMetadata(Trend trend) {
         String title = trend.getTitle() != null ? trend.getTitle().toLowerCase() : "";
