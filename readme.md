@@ -1,8 +1,6 @@
-# 🚀 AI Trend Explorer — [Live Microservices Dashboard](https://ai-trend-explorer-frontend-s01r.onrender.com/)
+# 🚀 AI Trend Explorer — Microservices Dashboard
 
-## 🌐 Live Links
-- **Frontend Dashboard**: [https://ai-trend-explorer-frontend-s01r.onrender.com](https://ai-trend-explorer-frontend-s01r.onrender.com)
-- **API Gateway**: [https://api-gateway-s01r.onrender.com](https://api-gateway-s01r.onrender.com)
+Enterprise Java Full Stack AI Trend Aggregator & Analyzer.
 
 ---
 
@@ -247,8 +245,6 @@ docker compose ps
 All 9 containers should report `Up (healthy)`.
 
 ### 5. Access the Platform
-- **Live Production Dashboard**: [https://ai-trend-explorer-frontend-s01r.onrender.com](https://ai-trend-explorer-frontend-s01r.onrender.com)
-- **Live Production API Gateway**: [https://api-gateway-s01r.onrender.com](https://api-gateway-s01r.onrender.com)
 - **Local Frontend Web UI**: [http://localhost:3000](http://localhost:3000)
 - **Local API Gateway**: [http://localhost:8080](http://localhost:8080)
 - **Trend Service OpenAPI Docs**: [http://localhost:8080/v3/api-docs/trends](http://localhost:8080/v3/api-docs/trends)
